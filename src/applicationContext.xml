@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd">
+
+	<!-- 占位配置 -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:META-INF/jdbc-datasource.properties</value>
+			</list>
+		</property>
+    </bean>
+
+	<!-- log4j注入定义
+	<bean class="org.mingy.kernel.context.Log4jConfigureContext">
+		<property name="log4jConfigLocation" value="classpath:log4j.xml" />
+		<property name="closeWithContainer" value="true" />
+	</bean> -->
+
+	<!-- ApplicationConfig注入定义 -->
+	<bean class="org.mingy.kernel.context.ApplicationConfigContext">
+		<property name="configLocation" value="classpath:applicationConfig.properties" />
+	</bean>
+	
+	<!-- JMX支持 -->
+	<bean class="org.springframework.jmx.export.annotation.AnnotationMBeanExporter" />
+
+	<!-- 数据源 -->
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.user}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+
+	<!-- JPA的实体管理器工厂定义 -->
+	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<property name="persistenceXmlLocation" value="classpath:META-INF/persistence.xml" />
+		<property name="dataSource" ref="dataSource" />
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.generate_statistics">${hibernate.generate_statistics}</prop>
+			</props>
+		</property>
+	</bean>
+
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="find*" read-only="true" />
+			<tx:method name="query*" read-only="true" />
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="load*" read-only="true" />
+			<tx:method name="*" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut id="facadeMethods" expression="execution(* org.mingy..facade.I*Facade.*(..))" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="facadeMethods" />
+	</aop:config>
+
+	<!-- JPA的事务管理器定义 -->
+	<bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<!-- CommonDao定义，用于后续所有简单对象的DAO操作 ，JPA DAO实现 -->
+	<bean id="commonDao" class="org.mingy.kernel.orm.impl.jpa.CommonDaoImpl">
+		<property name="entityManagerFactory" ref="entityManagerFactory" />
+	</bean>
+
+	<!-- 数据实体的通用DAO门面实现-->
+	<bean id="entityDao" class="org.mingy.kernel.facade.impl.EntityDaoFacadeImpl">
+		<property name="commonDao" ref="commonDao" />
+	</bean>
+
+</beans>

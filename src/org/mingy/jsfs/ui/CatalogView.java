@@ -1,0 +1,366 @@
+package org.mingy.jsfs.ui;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.eclipse.core.databinding.beans.BeanProperties;
+import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.databinding.viewers.ObservableListTreeContentProvider;
+import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.part.ViewPart;
+import org.mingy.jsfs.Activator;
+import org.mingy.jsfs.facade.IGoodsFacade;
+import org.mingy.jsfs.facade.IStaffFacade;
+import org.mingy.jsfs.model.orm.GoodsType;
+import org.mingy.jsfs.model.orm.Position;
+import org.mingy.jsfs.ui.model.Catalog;
+import org.mingy.kernel.context.GlobalBeanContext;
+import org.mingy.kernel.facade.IEntityDaoFacade;
+import org.mingy.kernel.util.Langs;
+
+public class CatalogView extends ViewPart {
+
+	public static final String ID = "org.mingy.jsfs.ui.CatalogView"; //$NON-NLS-1$
+
+	private static final Log logger = LogFactory.getLog(CatalogView.class);
+
+	private TreeViewer treeViewer;
+	private Action refreshAction;
+	private Action addAction;
+	private Action editAction;
+	private Action deleteAction;
+	private IEntityDaoFacade entityDao = GlobalBeanContext.getInstance()
+			.getBean(IEntityDaoFacade.class);
+
+	/**
+	 * Create contents of the view part.
+	 * 
+	 * @param parent
+	 */
+	@Override
+	public void createPartControl(Composite parent) {
+		Composite container = new Composite(parent, SWT.NONE);
+		container.setLayout(new FillLayout(SWT.HORIZONTAL));
+
+		treeViewer = new TreeViewer(container, SWT.BORDER);
+		ObservableListTreeContentProvider contentProvider = new ObservableListTreeContentProvider(
+				BeansObservables.listFactory("children", Catalog.class), null);
+		treeViewer.setContentProvider(contentProvider);
+		ObservableMapLabelProvider labelProvider = new ObservableMapLabelProvider(
+				BeanProperties.value("label").observeDetail(
+						contentProvider.getKnownElements())) {
+			private Image folderImage = Activator.getImageDescriptor(
+					"/icons/folder.gif").createImage();
+			private Image fileImage = Activator.getImageDescriptor(
+					"/icons/file.gif").createImage();
+
+			@Override
+			public Image getImage(Object element) {
+				Catalog node = (Catalog) element;
+				if (node.getType() != Catalog.TYPE_ITEM) {
+					return folderImage;
+				} else {
+					return fileImage;
+				}
+			}
+
+			@Override
+			public void dispose() {
+				folderImage.dispose();
+				fileImage.dispose();
+				super.dispose();
+			}
+		};
+		treeViewer.setLabelProvider(labelProvider);
+		treeViewer.setAutoExpandLevel(2);
+		treeViewer.setInput(loadAll());
+		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			@Override
+			public void selectionChanged(SelectionChangedEvent event) {
+				Catalog catalog = getSelectedItem();
+				if (catalog != null) {
+					addAction.setEnabled(catalog.isRoot() || catalog.isSub());
+					editAction.setEnabled(!catalog.isRoot());
+					deleteAction.setEnabled(!catalog.isRoot());
+				} else {
+					addAction.setEnabled(false);
+					editAction.setEnabled(false);
+					deleteAction.setEnabled(false);
+				}
+			}
+		});
+		treeViewer.addDoubleClickListener(new IDoubleClickListener() {
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				Catalog node = getSelectedItem();
+				if (node != null) {
+					if (node.getType() != Catalog.TYPE_ITEM) {
+						treeViewer.setExpandedState(node,
+								!treeViewer.getExpandedState(node));
+					} else {
+						editAction.run();
+					}
+				}
+			}
+		});
+
+		Tree tree = treeViewer.getTree();
+
+		createActions();
+		initializeToolBar();
+		initializeMenu();
+	}
+
+	private Catalog getSelectedItem() {
+		ISelection selection = treeViewer.getSelection();
+		if (selection.isEmpty()) {
+			return null;
+		} else if (selection instanceof IStructuredSelection) {
+			return (Catalog) ((IStructuredSelection) selection)
+					.getFirstElement();
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Create the actions.
+	 */
+	private void createActions() {
+		// Create the actions
+		refreshAction = new Action() {
+			@Override
+			public void run() {
+				treeViewer.setInput(loadAll());
+			}
+		};
+		refreshAction.setImageDescriptor(Activator
+				.getImageDescriptor("/icons/refresh.gif"));
+		refreshAction.setToolTipText("刷新");
+
+		addAction = new Action() {
+			@Override
+			public void run() {
+				Catalog catalog = getSelectedItem();
+				switch (catalog.getType()) {
+				case Catalog.TYPE_STAFF:
+					new PositionEditDialog(getSite().getShell(), catalog)
+							.open();
+					break;
+				case Catalog.TYPE_GOODS:
+					new GoodsTypeEditDialog(getSite().getShell(), catalog)
+							.open();
+					break;
+				}
+				/*
+				 * try { Catalog catalog = getSelectedItem(); switch
+				 * (catalog.getType()) { case Catalog.TYPE_STAFF: getSite()
+				 * .getWorkbenchWindow() .getActivePage() .openEditor(new
+				 * ResourceEditorInput(resource), TeacherEditor.ID); break; } }
+				 * catch (PartInitException e) { if (logger.isErrorEnabled()) {
+				 * logger.error("error on open editor", e); }
+				 * MessageDialog.openError(getSite().getShell(), "Error",
+				 * "Error opening editor:" + e.getLocalizedMessage()); }
+				 */
+			}
+		};
+		addAction.setImageDescriptor(Activator
+				.getImageDescriptor("/icons/add.gif"));
+		addAction.setDisabledImageDescriptor(Activator
+				.getImageDescriptor("/icons/add_disabled.gif"));
+		addAction.setToolTipText("新增");
+		addAction.setEnabled(false);
+
+		editAction = new Action() {
+			@Override
+			public void run() {
+				Catalog catalog = getSelectedItem();
+				switch (catalog.getType()) {
+				case Catalog.TYPE_CATALOG:
+					switch (catalog.getParent().getType()) {
+					case Catalog.TYPE_STAFF:
+						new PositionEditDialog(getSite().getShell(), catalog)
+								.open();
+						break;
+					case Catalog.TYPE_GOODS:
+						new GoodsTypeEditDialog(getSite().getShell(), catalog)
+								.open();
+						break;
+					}
+					break;
+				}
+				/*
+				 * try { Catalog catalog = getSelectedItem(); switch
+				 * (catalog.getParent().getType()) { case Catalog.TYPE_STAFF:
+				 * getSite() .getWorkbenchWindow() .getActivePage()
+				 * .openEditor(new ResourceEditorInput(resource),
+				 * TeacherEditor.ID); break; } } catch (PartInitException e) {
+				 * if (logger.isErrorEnabled()) {
+				 * logger.error("error on open editor", e); }
+				 * MessageDialog.openError(getSite().getShell(), "Error",
+				 * "Error opening editor:" + e.getLocalizedMessage()); }
+				 */
+			}
+		};
+		editAction.setImageDescriptor(Activator
+				.getImageDescriptor("/icons/edit.gif"));
+		editAction.setDisabledImageDescriptor(Activator
+				.getImageDescriptor("/icons/edit_disabled.gif"));
+		editAction.setToolTipText("修改");
+		editAction.setEnabled(false);
+
+		deleteAction = new Action() {
+			@Override
+			public void run() {
+				Catalog catalog = getSelectedItem();
+				switch (catalog.getType()) {
+				case Catalog.TYPE_CATALOG:
+					switch (catalog.getParent().getType()) {
+					case Catalog.TYPE_STAFF:
+						deletePosition(catalog);
+						break;
+					case Catalog.TYPE_GOODS:
+						deleteGoodsType(catalog);
+						break;
+					}
+					break;
+				}
+			}
+		};
+		deleteAction.setImageDescriptor(Activator
+				.getImageDescriptor("/icons/delete.gif"));
+		deleteAction.setDisabledImageDescriptor(Activator
+				.getImageDescriptor("/icons/delete_disabled.gif"));
+		deleteAction.setToolTipText("删除");
+		deleteAction.setEnabled(false);
+	}
+
+	private boolean deletePosition(Catalog catalog) {
+		Position position = (Position) catalog.getValue();
+		if (MessageDialog.openConfirm(
+				getSite().getShell(),
+				Langs.getText("confirm.delete.title"),
+				Langs.getText("confirm.delete_position.message",
+						position.getName()))) {
+			try {
+				GlobalBeanContext.getInstance().getBean(IStaffFacade.class)
+						.deletePosition(position.getId());
+				List<Catalog> list = new ArrayList<Catalog>(catalog.getParent()
+						.getChildren());
+				list.remove(catalog);
+				catalog.getParent().setChildren(list);
+				return true;
+			} catch (Exception e) {
+				MessageDialog.openError(
+						getSite().getShell(),
+						Langs.getText("error.delete.title"),
+						Langs.getText("error.delete.message", e.getClass()
+								.getName() + ": " + e.getLocalizedMessage()));
+			}
+		}
+		return false;
+	}
+
+	private boolean deleteGoodsType(Catalog catalog) {
+		GoodsType goodsType = (GoodsType) catalog.getValue();
+		if (MessageDialog.openConfirm(
+				getSite().getShell(),
+				Langs.getText("confirm.delete.title"),
+				Langs.getText("confirm.delete_goodsType.message",
+						goodsType.getName()))) {
+			try {
+				GlobalBeanContext.getInstance().getBean(IGoodsFacade.class)
+						.deleteGoodsType(goodsType.getId());
+				List<Catalog> list = new ArrayList<Catalog>(catalog.getParent()
+						.getChildren());
+				list.remove(catalog);
+				catalog.getParent().setChildren(list);
+				return true;
+			} catch (Exception e) {
+				MessageDialog.openError(
+						getSite().getShell(),
+						Langs.getText("error.delete.title"),
+						Langs.getText("error.delete.message", e.getClass()
+								.getName() + ": " + e.getLocalizedMessage()));
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Initialize the toolbar.
+	 */
+	private void initializeToolBar() {
+		IToolBarManager toolbarManager = getViewSite().getActionBars()
+				.getToolBarManager();
+		toolbarManager.add(refreshAction);
+		toolbarManager.add(new Separator());
+		toolbarManager.add(addAction);
+		toolbarManager.add(editAction);
+		toolbarManager.add(deleteAction);
+	}
+
+	/**
+	 * Initialize the menu.
+	 */
+	private void initializeMenu() {
+		IMenuManager menuManager = getViewSite().getActionBars()
+				.getMenuManager();
+	}
+
+	@Override
+	public void setFocus() {
+		// Set the focus
+	}
+
+	private Catalog loadAll() {
+		Catalog root = new Catalog(Catalog.TYPE_ROOT);
+		Catalog staffCatalog = new Catalog(Catalog.TYPE_STAFF);
+		staffCatalog.setParent(root);
+		root.getChildren().add(staffCatalog);
+		Catalog goodsCatalog = new Catalog(Catalog.TYPE_GOODS);
+		goodsCatalog.setParent(root);
+		root.getChildren().add(goodsCatalog);
+		Catalog ruleCatalog = new Catalog(Catalog.TYPE_RULE);
+		ruleCatalog.setParent(root);
+		root.getChildren().add(ruleCatalog);
+		loadStaffs(staffCatalog);
+		loadGoods(goodsCatalog);
+		return root;
+	}
+
+	private void loadStaffs(Catalog parent) {
+		for (Position position : entityDao.loadAll(Position.class, true)) {
+			Catalog catalog = new Catalog(position);
+			catalog.setParent(parent);
+			parent.getChildren().add(catalog);
+		}
+	}
+
+	private void loadGoods(Catalog parent) {
+		for (GoodsType goodsType : entityDao.loadAll(GoodsType.class, true)) {
+			Catalog catalog = new Catalog(goodsType);
+			catalog.setParent(parent);
+			parent.getChildren().add(catalog);
+		}
+	}
+}

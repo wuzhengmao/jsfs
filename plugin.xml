@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.mingy.jsfs.ui.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="JSFS Perspective"
+            class="org.mingy.jsfs.ui.Perspective"
+            id="org.mingy.jsfs.ui.perspective">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.mingy.jsfs.ui.CatalogView"
+            id="org.mingy.jsfs.ui.CatalogView"
+            name="目录浏览">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="Catalog"
+            id="org.mingy.jsfs.ui.catalog">
+      </category>
+      <category
+            name="Assistant"
+            id="org.mingy.jsfs.ui.assistant">
+      </category>
+      <command
+            name="目录浏览"
+            description="打开目录浏览视图"
+            categoryId="org.mingy.jsfs.ui.catalog"
+            id="org.mingy.jsfs.ui.openCatalog">
+      </command>
+      <command
+            name="控制台"
+            description="打开控制台以显示日志"
+            categoryId="org.mingy.jsfs.ui.assistant"
+            id="org.mingy.jsfs.ui.openConsole">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="org.mingy.jsfs.ui.openCatalog"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+R">
+      </key>
+      <key
+            commandId="org.mingy.jsfs.ui.openConsole"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+L">
+      </key>
+   </extension>
+ 
+</plugin>

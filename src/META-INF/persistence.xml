@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0"
+	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+	<persistence-unit name="jsfs" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+
+		<class>org.mingy.jsfs.model.orm.Position</class>
+		<class>org.mingy.jsfs.model.orm.Staff</class>
+		<class>org.mingy.jsfs.model.orm.GoodsType</class>
+		<class>org.mingy.jsfs.model.orm.Goods</class>
+		<class>org.mingy.jsfs.model.orm.RewardRule</class>
+		<class>org.mingy.jsfs.model.orm.RewardRuleDetail</class>
+	</persistence-unit>
+</persistence>
