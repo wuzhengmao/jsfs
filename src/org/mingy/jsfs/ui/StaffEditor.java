@@ -1,6 +1,5 @@
 package org.mingy.jsfs.ui;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
@@ -13,12 +12,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.mingy.jsfs.model.orm.Position;
-import org.mingy.jsfs.model.orm.Staff;
+import org.mingy.jsfs.facade.IStaffFacade;
+import org.mingy.jsfs.model.Position;
+import org.mingy.jsfs.model.Staff;
 import org.mingy.jsfs.ui.model.Catalog;
 import org.mingy.jsfs.ui.model.CatalogToValueConverter;
 import org.mingy.jsfs.ui.model.ValueToCatalogConverter;
 import org.mingy.jsfs.ui.util.UIUtils;
+import org.mingy.kernel.context.GlobalBeanContext;
 
 public class StaffEditor extends AbstractFormEditor<Staff> {
 
@@ -36,15 +37,10 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 		Catalog catalog = (Catalog) getEditorInput().getAdapter(Catalog.class);
 		Staff staff = (Staff) catalog.getValue();
 		setPartName(staff != null ? "修改员工 - " + staff.getName() : "新增员工");
-		Staff bean;
+		Staff bean = new Staff();
 		if (staff != null) {
-			try {
-				bean = (Staff) BeanUtils.cloneBean(staff);
-			} catch (Exception e) {
-				throw new RuntimeException("error on clone bean", e);
-			}
+			staff.copyTo(bean);
 		} else {
-			bean = new Staff();
 			bean.setPosition((Position) catalog.getParent().getValue());
 		}
 		return bean;
@@ -153,7 +149,8 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 
 	@Override
 	protected void save(Staff bean) {
-		entityDao.save(bean);
+		GlobalBeanContext.getInstance().getBean(IStaffFacade.class)
+				.saveStaff(bean);
 	}
 
 	@Override
@@ -169,7 +166,7 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 				}
 			}
 		} else {
-			catalog.setValue(bean);
+			bean.copyTo((Staff) catalog.getValue());
 			if (!catalog.getParent().getValue().equals(bean.getPosition())) {
 				catalog.getParent().getChildren().remove(catalog);
 				for (Catalog c : catalog.getParent().getParent().getChildren()) {

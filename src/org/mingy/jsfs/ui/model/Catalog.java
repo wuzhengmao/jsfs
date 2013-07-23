@@ -1,14 +1,18 @@
 package org.mingy.jsfs.ui.model;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.list.IObservableList;
 import org.eclipse.core.databinding.observable.list.WritableList;
-import org.mingy.jsfs.model.orm.ICatalog;
-import org.mingy.jsfs.model.orm.INamedObject;
+import org.mingy.jsfs.model.ICatalog;
+import org.mingy.jsfs.model.INamedObject;
+import org.mingy.jsfs.model.PropertyChangeSupportBean;
 import org.mingy.kernel.util.Langs;
 
-public class Catalog extends PropertyChangeSupportBean {
+public class Catalog extends PropertyChangeSupportBean implements
+		PropertyChangeListener {
 
 	public static final int TYPE_ROOT = 0;
 	public static final int TYPE_STAFF = 1;
@@ -21,15 +25,18 @@ public class Catalog extends PropertyChangeSupportBean {
 	private Catalog parent;
 	private IObservableList children = new WritableList();
 
-	private Object value;
+	private INamedObject value;
 
 	public Catalog(int type) {
 		this.type = type;
 	}
 
-	public Catalog(Object value) {
+	public Catalog(INamedObject value) {
 		this.type = value instanceof ICatalog ? TYPE_CATALOG : TYPE_ITEM;
 		this.value = value;
+		if (this.value != null) {
+			this.value.addNameChangeListener(this);
+		}
 	}
 
 	@Override
@@ -50,27 +57,38 @@ public class Catalog extends PropertyChangeSupportBean {
 		}
 	}
 
+	@Override
+	public void propertyChange(PropertyChangeEvent evt) {
+		firePropertyChange("label", evt.getOldValue(), evt.getNewValue());
+	}
+
 	public int getType() {
 		return type;
 	}
 
-	public Object getValue() {
+	public INamedObject getValue() {
 		return value;
 	}
 
-	public void setValue(Object value) {
-		String oldLabel = getLabel();
-		this.value = value;
-		firePropertyChange("label", oldLabel, getLabel());
+	public void setValue(INamedObject value) {
+		if (this.value != value) {
+			if (this.value != null) {
+				this.value.removeNameChangeListener(this);
+			}
+			String label = getLabel();
+			this.value = value;
+			if (this.value != null) {
+				this.value.addNameChangeListener(this);
+			}
+			firePropertyChange("label", label, getLabel());
+		}
 	}
 
 	public String getLabel() {
 		if (isRoot()) {
 			return Langs.getLabel("catalog.type", type);
-		} else if (value instanceof INamedObject) {
-			return ((INamedObject) value).getName();
 		} else {
-			return value != null ? value.toString() : null;
+			return value != null ? value.getName() : null;
 		}
 	}
 

@@ -14,7 +14,7 @@ import org.mingy.kernel.bean.IEntity;
 
 @Entity
 @Table(name = "T_REWARD_RULE_DETAIL")
-public class RewardRuleDetail implements IEntity {
+public class RewardRuleDetailEntity implements IEntity {
 
 	private static final long serialVersionUID = 1788503780897322068L;
 
@@ -28,7 +28,7 @@ public class RewardRuleDetail implements IEntity {
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "RULE_ID", nullable = false)
-	private RewardRule rule;
+	private RewardRuleEntity rule;
 
 	@Column(name = "MIN_COUNT")
 	private Integer minCount;
@@ -53,11 +53,11 @@ public class RewardRuleDetail implements IEntity {
 		this.id = id;
 	}
 
-	public RewardRule getRule() {
+	public RewardRuleEntity getRule() {
 		return rule;
 	}
 
-	public void setRule(RewardRule rule) {
+	public void setRule(RewardRuleEntity rule) {
 		this.rule = rule;
 	}
 

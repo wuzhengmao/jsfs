@@ -6,6 +6,7 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoProperties;
@@ -33,37 +34,40 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.mingy.jsfs.ui.util.Jsr303BeanValidator;
-import org.mingy.kernel.context.GlobalBeanContext;
-import org.mingy.kernel.facade.IEntityDaoFacade;
 import org.mingy.kernel.util.Langs;
 import org.mingy.kernel.util.Validators;
 
 public abstract class AbstractFormEditor<T> extends EditorPart {
 
 	protected DefaultModifyListener defaultModifyListener = new DefaultModifyListener();
-	protected IEntityDaoFacade entityDao = GlobalBeanContext.getInstance()
-			.getBean(IEntityDaoFacade.class);
 	protected DataBindingContext dataBindingContext;
 	private Map<Control, ControlDecoration> decoratorMap = new HashMap<Control, ControlDecoration>();
 	private T bean;
 	private boolean dirty = false;
+	private boolean ignoreChange = false;
 
 	private class DefaultModifyListener implements ModifyListener,
 			ISelectionChangedListener, SelectionListener {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
-			setDirty(true);
+			if (!ignoreChange) {
+				setDirty(true);
+			}
 		}
 
 		@Override
 		public void modifyText(ModifyEvent e) {
-			setDirty(true);
+			if (!ignoreChange) {
+				setDirty(true);
+			}
 		}
 
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			setDirty(true);
+			if (!ignoreChange) {
+				setDirty(true);
+			}
 		}
 
 		@Override
@@ -75,10 +79,12 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		createControls(parent);
+		setDirty(false);
+		ignoreChange = true;
 		dataBindingContext = new DataBindingContext();
 		initDataBindings(bean);
 		fillForm(bean);
-		setDirty(false);
+		ignoreChange = false;
 	}
 
 	protected abstract T init();
@@ -181,10 +187,7 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 			}
 			setDirty(false);
 			postSave(bean);
-			bean = init();
-			initDataBindings(bean);
-			fillForm(bean);
-			setDirty(false);
+			reset();
 		}
 	}
 
@@ -199,6 +202,23 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 		setSite(site);
 		setInput(input);
 		bean = init();
+	}
+
+	public void init(IEditorInput input) {
+		setInput(input);
+		reset();
+	}
+
+	protected void reset() {
+		for (Object binding : dataBindingContext.getBindings().toArray()) {
+			((Binding) binding).dispose();
+		}
+		bean = init();
+		setDirty(false);
+		ignoreChange = true;
+		initDataBindings(bean);
+		fillForm(bean);
+		ignoreChange = false;
 	}
 
 	protected T getBean() {

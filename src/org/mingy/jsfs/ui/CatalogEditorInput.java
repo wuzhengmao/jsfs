@@ -30,7 +30,7 @@ public class CatalogEditorInput implements IEditorInput {
 		if (adapter.isAssignableFrom(Catalog.class)) {
 			return catalog;
 		} else {
-			return (Class) catalog.getValue();
+			return catalog.getValue();
 		}
 	}
 

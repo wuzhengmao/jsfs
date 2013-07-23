@@ -15,14 +15,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.mingy.kernel.bean.IEntity;
 
 @Entity
 @Table(name = "T_REWARD_RULE")
-public class RewardRule implements IEntity, INamedObject {
+public class RewardRuleEntity implements IEntity {
 
 	private static final long serialVersionUID = 2104183255814439785L;
 
@@ -32,46 +29,25 @@ public class RewardRule implements IEntity, INamedObject {
 	private Long id;
 
 	@Column(name = "NAME", nullable = false, length = 100)
-	@NotBlank(message = "{name.NotNull}")
-	@Length(max = 50, message = "{name.MaxLength}")
 	private String name;
 
-	@ManyToMany(targetEntity = Position.class, cascade = {}, fetch = FetchType.LAZY)
+	@ManyToMany(targetEntity = PositionEntity.class, cascade = {}, fetch = FetchType.LAZY)
 	@JoinTable(name = "T_REWARD_RULE_POSITION", joinColumns = { @JoinColumn(name = "RULE_ID", referencedColumnName = "ID", nullable = false) }, inverseJoinColumns = { @JoinColumn(name = "POSITION_ID", referencedColumnName = "ID", nullable = false) })
-	@NotEmpty(message = "{positions.NotEmpty}")
-	private List<Position> positions;
+	private List<PositionEntity> positions;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "GOODS_TYPE")
-	private GoodsType goodsType;
+	private GoodsTypeEntity goodsType;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "GOODS_ID")
-	private Goods goods;
+	private GoodsEntity goods;
 
 	@OneToMany(mappedBy = "rule", fetch = FetchType.EAGER)
-	private List<RewardRuleDetail> details;
+	private List<RewardRuleDetailEntity> details;
 
 	@Column(name = "DESCRIPTION", length = 200)
-	@Length(max = 100, message = "{desc.MaxLength}")
 	private String description;
-
-	@Override
-	public int hashCode() {
-		return id != null ? RewardRule.class.hashCode() * 31 + id.hashCode()
-				: super.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof RewardRule)) {
-			return false;
-		} else if (id == null) {
-			return super.equals(obj);
-		} else {
-			return id.equals(((RewardRule) obj).getId());
-		}
-	}
 
 	public Long getId() {
 		return id;
@@ -89,35 +65,35 @@ public class RewardRule implements IEntity, INamedObject {
 		this.name = name;
 	}
 
-	public List<Position> getPositions() {
+	public List<PositionEntity> getPositions() {
 		return positions;
 	}
 
-	public void setPositions(List<Position> positions) {
+	public void setPositions(List<PositionEntity> positions) {
 		this.positions = positions;
 	}
 
-	public GoodsType getGoodsType() {
+	public GoodsTypeEntity getGoodsType() {
 		return goodsType;
 	}
 
-	public void setGoodsType(GoodsType goodsType) {
+	public void setGoodsType(GoodsTypeEntity goodsType) {
 		this.goodsType = goodsType;
 	}
 
-	public Goods getGoods() {
+	public GoodsEntity getGoods() {
 		return goods;
 	}
 
-	public void setGoods(Goods goods) {
+	public void setGoods(GoodsEntity goods) {
 		this.goods = goods;
 	}
 
-	public List<RewardRuleDetail> getDetails() {
+	public List<RewardRuleDetailEntity> getDetails() {
 		return details;
 	}
 
-	public void setDetails(List<RewardRuleDetail> details) {
+	public void setDetails(List<RewardRuleDetailEntity> details) {
 		this.details = details;
 	}
 

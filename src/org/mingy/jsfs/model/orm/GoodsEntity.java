@@ -9,16 +9,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 import org.mingy.kernel.bean.IEntity;
 import org.mingy.kernel.bean.ILogicDeletable;
 
 @Entity
 @Table(name = "T_GOODS")
-public class Goods implements IEntity, ILogicDeletable, INamedObject {
+public class GoodsEntity implements IEntity, ILogicDeletable {
 
 	private static final long serialVersionUID = -4894504350810578341L;
 
@@ -29,41 +26,19 @@ public class Goods implements IEntity, ILogicDeletable, INamedObject {
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "TYPE", nullable = false)
-	@NotNull(message = "{type.NotNull}")
-	private GoodsType type;
+	private GoodsTypeEntity type;
 
 	@Column(name = "NAME", nullable = false, length = 100)
-	@NotBlank(message = "{name.NotNull}")
-	@Length(max = 50, message = "{name.MaxLength}")
 	private String name;
 
 	@Column(name = "SALES_PRICE", nullable = false, precision = 7, scale = 2)
-	@NotBlank(message = "{salesPrice.NotNull}")
 	private Double salesPrice;
 
 	@Column(name = "MEMO", length = 200)
-	@Length(max = 100, message = "{memo.MaxLength}")
 	private String memo;
 
 	@Column(name = "VALID", nullable = false)
 	private boolean valid = true;
-
-	@Override
-	public int hashCode() {
-		return id != null ? Goods.class.hashCode() * 31 + id.hashCode() : super
-				.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Goods)) {
-			return false;
-		} else if (id == null) {
-			return super.equals(obj);
-		} else {
-			return id.equals(((Goods) obj).getId());
-		}
-	}
 
 	public Long getId() {
 		return id;
@@ -73,11 +48,11 @@ public class Goods implements IEntity, ILogicDeletable, INamedObject {
 		this.id = id;
 	}
 
-	public GoodsType getType() {
+	public GoodsTypeEntity getType() {
 		return type;
 	}
 
-	public void setType(GoodsType type) {
+	public void setType(GoodsTypeEntity type) {
 		this.type = type;
 	}
 

@@ -1,18 +1,15 @@
 package org.mingy.jsfs.ui;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.mingy.jsfs.model.orm.Position;
+import org.mingy.jsfs.facade.IStaffFacade;
+import org.mingy.jsfs.model.Position;
 import org.mingy.jsfs.ui.model.Catalog;
 import org.mingy.kernel.context.GlobalBeanContext;
-import org.mingy.kernel.facade.IEntityDaoFacade;
 import org.mingy.kernel.util.Langs;
 
 public class PositionEditDialog extends CatalogEditDialog {
 
-	private IEntityDaoFacade entityDao = GlobalBeanContext.getInstance()
-			.getBean(IEntityDaoFacade.class);
 	private Catalog catalog;
 	private Position position;
 	private boolean editMode;
@@ -25,11 +22,7 @@ public class PositionEditDialog extends CatalogEditDialog {
 			this.catalog.setParent(catalog);
 		} else {
 			this.catalog = catalog;
-			try {
-				BeanUtils.copyProperties(this.position, catalog.getValue());
-			} catch (Exception e) {
-				throw new RuntimeException("error on clone bean", e);
-			}
+			((Position) catalog.getValue()).copyTo(this.position);
 		}
 		this.editMode = !catalog.isRoot();
 	}
@@ -55,7 +48,8 @@ public class PositionEditDialog extends CatalogEditDialog {
 	@Override
 	protected boolean onOk() {
 		try {
-			entityDao.save(position);
+			GlobalBeanContext.getInstance().getBean(IStaffFacade.class)
+					.savePosition(position);
 		} catch (Exception e) {
 			MessageDialog.openError(
 					getShell(),
@@ -64,7 +58,7 @@ public class PositionEditDialog extends CatalogEditDialog {
 							+ ": " + e.getLocalizedMessage()));
 			return false;
 		}
-		catalog.setValue(position);
+		position.copyTo((Position) catalog.getValue());
 		if (!editMode) {
 			catalog.getParent().getChildren().add(catalog);
 		}

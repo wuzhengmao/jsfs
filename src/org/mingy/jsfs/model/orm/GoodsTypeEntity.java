@@ -7,16 +7,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 import org.mingy.kernel.bean.IEntity;
 import org.mingy.kernel.bean.ILogicDeletable;
 
 @Entity
-@Table(name = "T_POSITION")
-public class Position implements IEntity, ILogicDeletable, ICatalog {
+@Table(name = "T_GOODS_TYPE")
+public class GoodsTypeEntity implements IEntity, ILogicDeletable {
 
-	private static final long serialVersionUID = 7519454219182308819L;
+	private static final long serialVersionUID = 3221586385062860874L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,33 +22,13 @@ public class Position implements IEntity, ILogicDeletable, ICatalog {
 	private Long id;
 
 	@Column(name = "NAME", nullable = false, length = 100)
-	@NotBlank(message = "{name.NotNull}")
-	@Length(max = 50, message = "{name.MaxLength}")
 	private String name;
 
 	@Column(name = "DESCRIPTION", length = 200)
-	@Length(max = 100, message = "{desc.MaxLength}")
 	private String description;
 
 	@Column(name = "VALID", nullable = false)
 	private boolean valid = true;
-
-	@Override
-	public int hashCode() {
-		return id != null ? Position.class.hashCode() * 31 + id.hashCode()
-				: super.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Position)) {
-			return false;
-		} else if (id == null) {
-			return super.equals(obj);
-		} else {
-			return id.equals(((Position) obj).getId());
-		}
-	}
 
 	public Long getId() {
 		return id;

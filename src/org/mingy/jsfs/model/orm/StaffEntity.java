@@ -13,16 +13,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 import org.mingy.kernel.bean.IEntity;
 import org.mingy.kernel.bean.ILogicDeletable;
 
 @Entity
 @Table(name = "T_STAFF")
-public class Staff implements IEntity, ILogicDeletable, INamedObject {
+public class StaffEntity implements IEntity, ILogicDeletable {
 
 	private static final long serialVersionUID = 6113019262565286354L;
 
@@ -32,12 +29,9 @@ public class Staff implements IEntity, ILogicDeletable, INamedObject {
 	private Long id;
 
 	@Column(name = "NAME", nullable = false, length = 100)
-	@NotBlank(message = "{name.NotNull}")
-	@Length(max = 50, message = "{name.MaxLength}")
 	private String name;
 
 	@Column(name = "SEX", nullable = false)
-	@NotNull(message = "{sex.NotNull}")
 	private Integer sex;
 
 	@Column(name = "BIRTHDAY")
@@ -45,37 +39,17 @@ public class Staff implements IEntity, ILogicDeletable, INamedObject {
 	private Date birthday;
 
 	@Column(name = "CONTACTS", length = 100)
-	@Length(max = 50, message = "{contacts.MaxLength}")
 	private String contacts;
 
 	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "POSITION_ID", nullable = false)
-	@NotNull(message = "{position.NotNull}")
-	private Position position;
+	private PositionEntity position;
 
 	@Column(name = "MEMO", length = 200)
-	@Length(max = 10, message = "{memo.MaxLength}")
 	private String memo;
 
 	@Column(name = "VALID", nullable = false)
 	private boolean valid = true;
-
-	@Override
-	public int hashCode() {
-		return id != null ? Staff.class.hashCode() * 31 + id.hashCode() : super
-				.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Staff)) {
-			return false;
-		} else if (id == null) {
-			return super.equals(obj);
-		} else {
-			return id.equals(((Staff) obj).getId());
-		}
-	}
 
 	public Long getId() {
 		return id;
@@ -117,11 +91,11 @@ public class Staff implements IEntity, ILogicDeletable, INamedObject {
 		this.contacts = contacts;
 	}
 
-	public Position getPosition() {
+	public PositionEntity getPosition() {
 		return position;
 	}
 
-	public void setPosition(Position position) {
+	public void setPosition(PositionEntity position) {
 		this.position = position;
 	}
 

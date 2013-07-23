@@ -1,4 +1,4 @@
-package org.mingy.jsfs.ui.model;
+package org.mingy.jsfs.model;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

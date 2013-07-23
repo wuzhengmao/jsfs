@@ -1,6 +1,7 @@
 package org.mingy.jsfs.ui.model;
 
 import org.eclipse.core.databinding.conversion.Converter;
+import org.mingy.jsfs.model.INamedObject;
 
 public class ValueToCatalogConverter extends Converter {
 
@@ -10,6 +11,6 @@ public class ValueToCatalogConverter extends Converter {
 
 	@Override
 	public Object convert(Object fromObject) {
-		return new Catalog(fromObject);
+		return new Catalog((INamedObject) fromObject);
 	}
 }
