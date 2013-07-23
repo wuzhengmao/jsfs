@@ -48,7 +48,7 @@ public class Staff implements IEntity, ILogicDeletable, INamedObject {
 	@Length(max = 50, message = "{contacts.MaxLength}")
 	private String contacts;
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	@JoinColumn(name = "POSITION_ID", nullable = false)
 	@NotNull(message = "{position.NotNull}")
 	private Position position;
@@ -59,6 +59,23 @@ public class Staff implements IEntity, ILogicDeletable, INamedObject {
 
 	@Column(name = "VALID", nullable = false)
 	private boolean valid = true;
+
+	@Override
+	public int hashCode() {
+		return id != null ? Staff.class.hashCode() * 31 + id.hashCode() : super
+				.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Staff)) {
+			return false;
+		} else if (id == null) {
+			return super.equals(obj);
+		} else {
+			return id.equals(((Staff) obj).getId());
+		}
+	}
 
 	public Long getId() {
 		return id;

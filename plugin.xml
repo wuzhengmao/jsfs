@@ -21,6 +21,11 @@
    </extension>
    <extension
          point="org.eclipse.ui.editors">
+      <editor
+            class="org.mingy.jsfs.ui.StaffEditor"
+            id="org.mingy.jsfs.ui.StaffEditor"
+            name="员工维护">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.views">

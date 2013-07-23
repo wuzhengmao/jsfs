@@ -2,9 +2,12 @@ package org.mingy.jsfs.model.orm;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -24,7 +27,8 @@ public class Goods implements IEntity, ILogicDeletable, INamedObject {
 	@Column(name = "ID", updatable = false, nullable = false)
 	private Long id;
 
-	@Column(name = "TYPE", nullable = false)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
+	@JoinColumn(name = "TYPE", nullable = false)
 	@NotNull(message = "{type.NotNull}")
 	private GoodsType type;
 
@@ -43,6 +47,23 @@ public class Goods implements IEntity, ILogicDeletable, INamedObject {
 
 	@Column(name = "VALID", nullable = false)
 	private boolean valid = true;
+
+	@Override
+	public int hashCode() {
+		return id != null ? Goods.class.hashCode() * 31 + id.hashCode() : super
+				.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Goods)) {
+			return false;
+		} else if (id == null) {
+			return super.equals(obj);
+		} else {
+			return id.equals(((Goods) obj).getId());
+		}
+	}
 
 	public Long getId() {
 		return id;

@@ -1,8 +1,5 @@
 package org.mingy.jsfs.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -69,10 +66,7 @@ public class GoodsTypeEditDialog extends CatalogEditDialog {
 		}
 		catalog.setValue(goodsType);
 		if (!editMode) {
-			List<Catalog> list = new ArrayList<Catalog>(catalog.getParent()
-					.getChildren());
-			list.add(catalog);
-			catalog.getParent().setChildren(list);
+			catalog.getParent().getChildren().add(catalog);
 		}
 		return true;
 	}

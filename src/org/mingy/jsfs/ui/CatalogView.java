@@ -1,12 +1,11 @@
 package org.mingy.jsfs.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.core.databinding.beans.BeanProperties;
-import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.IObservable;
+import org.eclipse.core.databinding.observable.list.DecoratingObservableList;
+import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -25,16 +24,19 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 import org.mingy.jsfs.Activator;
 import org.mingy.jsfs.facade.IGoodsFacade;
 import org.mingy.jsfs.facade.IStaffFacade;
 import org.mingy.jsfs.model.orm.GoodsType;
 import org.mingy.jsfs.model.orm.Position;
+import org.mingy.jsfs.model.orm.Staff;
 import org.mingy.jsfs.ui.model.Catalog;
 import org.mingy.kernel.context.GlobalBeanContext;
 import org.mingy.kernel.facade.IEntityDaoFacade;
+import org.mingy.kernel.util.ApplicationException;
 import org.mingy.kernel.util.Langs;
 
 public class CatalogView extends ViewPart {
@@ -63,7 +65,14 @@ public class CatalogView extends ViewPart {
 
 		treeViewer = new TreeViewer(container, SWT.BORDER);
 		ObservableListTreeContentProvider contentProvider = new ObservableListTreeContentProvider(
-				BeansObservables.listFactory("children", Catalog.class), null);
+				new IObservableFactory() {
+					@Override
+					public IObservable createObservable(Object target) {
+						return new DecoratingObservableList(
+								((Catalog) target).getObservableChildren(),
+								false);
+					}
+				}, null);
 		treeViewer.setContentProvider(contentProvider);
 		ObservableMapLabelProvider labelProvider = new ObservableMapLabelProvider(
 				BeanProperties.value("label").observeDetail(
@@ -123,8 +132,6 @@ public class CatalogView extends ViewPart {
 			}
 		});
 
-		Tree tree = treeViewer.getTree();
-
 		createActions();
 		initializeToolBar();
 		initializeMenu();
@@ -170,17 +177,32 @@ public class CatalogView extends ViewPart {
 					new GoodsTypeEditDialog(getSite().getShell(), catalog)
 							.open();
 					break;
+				case Catalog.TYPE_CATALOG:
+					try {
+						switch (catalog.getParent().getType()) {
+						case Catalog.TYPE_STAFF:
+							getSite()
+									.getWorkbenchWindow()
+									.getActivePage()
+									.openEditor(
+											new CatalogEditorInput(catalog),
+											StaffEditor.ID);
+							break;
+						case Catalog.TYPE_GOODS:
+							break;
+						}
+					} catch (PartInitException e) {
+						if (logger.isErrorEnabled()) {
+							logger.error("error on open editor", e);
+						}
+						MessageDialog.openError(
+								getSite().getShell(),
+								"Error",
+								"Error opening editor:"
+										+ e.getLocalizedMessage());
+					}
+					break;
 				}
-				/*
-				 * try { Catalog catalog = getSelectedItem(); switch
-				 * (catalog.getType()) { case Catalog.TYPE_STAFF: getSite()
-				 * .getWorkbenchWindow() .getActivePage() .openEditor(new
-				 * ResourceEditorInput(resource), TeacherEditor.ID); break; } }
-				 * catch (PartInitException e) { if (logger.isErrorEnabled()) {
-				 * logger.error("error on open editor", e); }
-				 * MessageDialog.openError(getSite().getShell(), "Error",
-				 * "Error opening editor:" + e.getLocalizedMessage()); }
-				 */
 			}
 		};
 		addAction.setImageDescriptor(Activator
@@ -207,18 +229,32 @@ public class CatalogView extends ViewPart {
 						break;
 					}
 					break;
+				case Catalog.TYPE_ITEM:
+					try {
+						switch (catalog.getParent().getParent().getType()) {
+						case Catalog.TYPE_STAFF:
+							getSite()
+									.getWorkbenchWindow()
+									.getActivePage()
+									.openEditor(
+											new CatalogEditorInput(catalog),
+											StaffEditor.ID);
+							break;
+						case Catalog.TYPE_GOODS:
+							break;
+						}
+					} catch (PartInitException e) {
+						if (logger.isErrorEnabled()) {
+							logger.error("error on open editor", e);
+						}
+						MessageDialog.openError(
+								getSite().getShell(),
+								"Error",
+								"Error opening editor:"
+										+ e.getLocalizedMessage());
+					}
+					break;
 				}
-				/*
-				 * try { Catalog catalog = getSelectedItem(); switch
-				 * (catalog.getParent().getType()) { case Catalog.TYPE_STAFF:
-				 * getSite() .getWorkbenchWindow() .getActivePage()
-				 * .openEditor(new ResourceEditorInput(resource),
-				 * TeacherEditor.ID); break; } } catch (PartInitException e) {
-				 * if (logger.isErrorEnabled()) {
-				 * logger.error("error on open editor", e); }
-				 * MessageDialog.openError(getSite().getShell(), "Error",
-				 * "Error opening editor:" + e.getLocalizedMessage()); }
-				 */
 			}
 		};
 		editAction.setImageDescriptor(Activator
@@ -243,6 +279,15 @@ public class CatalogView extends ViewPart {
 						break;
 					}
 					break;
+				case Catalog.TYPE_ITEM:
+					switch (catalog.getParent().getParent().getType()) {
+					case Catalog.TYPE_STAFF:
+						deleteStaff(catalog);
+						break;
+					case Catalog.TYPE_GOODS:
+						break;
+					}
+					break;
 				}
 			}
 		};
@@ -264,17 +309,10 @@ public class CatalogView extends ViewPart {
 			try {
 				GlobalBeanContext.getInstance().getBean(IStaffFacade.class)
 						.deletePosition(position.getId());
-				List<Catalog> list = new ArrayList<Catalog>(catalog.getParent()
-						.getChildren());
-				list.remove(catalog);
-				catalog.getParent().setChildren(list);
+				catalog.getParent().getChildren().remove(catalog);
 				return true;
 			} catch (Exception e) {
-				MessageDialog.openError(
-						getSite().getShell(),
-						Langs.getText("error.delete.title"),
-						Langs.getText("error.delete.message", e.getClass()
-								.getName() + ": " + e.getLocalizedMessage()));
+				handleExceptionOnDelete(e);
 			}
 		}
 		return false;
@@ -290,20 +328,49 @@ public class CatalogView extends ViewPart {
 			try {
 				GlobalBeanContext.getInstance().getBean(IGoodsFacade.class)
 						.deleteGoodsType(goodsType.getId());
-				List<Catalog> list = new ArrayList<Catalog>(catalog.getParent()
-						.getChildren());
-				list.remove(catalog);
-				catalog.getParent().setChildren(list);
+				catalog.getParent().getChildren().remove(catalog);
 				return true;
 			} catch (Exception e) {
-				MessageDialog.openError(
-						getSite().getShell(),
-						Langs.getText("error.delete.title"),
-						Langs.getText("error.delete.message", e.getClass()
-								.getName() + ": " + e.getLocalizedMessage()));
+				handleExceptionOnDelete(e);
 			}
 		}
 		return false;
+	}
+
+	private boolean deleteStaff(Catalog catalog) {
+		Staff staff = (Staff) catalog.getValue();
+		if (MessageDialog.openConfirm(getSite().getShell(),
+				Langs.getText("confirm.delete.title"),
+				Langs.getText("confirm.delete_staff.message", staff.getName()))) {
+			try {
+				GlobalBeanContext.getInstance().getBean(IStaffFacade.class)
+						.deleteStaff(staff.getId());
+				catalog.getParent().getChildren().remove(catalog);
+				IEditorPart editor = getSite().getWorkbenchWindow()
+						.getActivePage()
+						.findEditor(new CatalogEditorInput(catalog));
+				if (editor != null) {
+					getSite().getWorkbenchWindow().getActivePage()
+							.closeEditor(editor, false);
+				}
+				return true;
+			} catch (Exception e) {
+				handleExceptionOnDelete(e);
+			}
+		}
+		return false;
+	}
+
+	private void handleExceptionOnDelete(Exception e) {
+		if (logger.isErrorEnabled() && !(e instanceof ApplicationException)) {
+			logger.error("error on delete", e);
+		}
+		MessageDialog.openError(getSite().getShell(), Langs
+				.getText("error.delete.title"), Langs.getText(
+				"error.delete.message",
+				(e instanceof ApplicationException ? "" : e.getClass()
+						.getName() + ": ")
+						+ e.getLocalizedMessage()));
 	}
 
 	/**
@@ -353,6 +420,16 @@ public class CatalogView extends ViewPart {
 			Catalog catalog = new Catalog(position);
 			catalog.setParent(parent);
 			parent.getChildren().add(catalog);
+		}
+		for (Staff staff : entityDao.loadAll(Staff.class, true)) {
+			for (Catalog catalog : parent.getChildren()) {
+				if (catalog.getValue().equals(staff.getPosition())) {
+					Catalog child = new Catalog(staff);
+					child.setParent(catalog);
+					catalog.getChildren().add(child);
+					break;
+				}
+			}
 		}
 	}
 

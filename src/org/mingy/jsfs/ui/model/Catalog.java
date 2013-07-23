@@ -1,8 +1,9 @@
 package org.mingy.jsfs.ui.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.databinding.observable.list.WritableList;
 import org.mingy.jsfs.model.orm.ICatalog;
 import org.mingy.jsfs.model.orm.INamedObject;
 import org.mingy.kernel.util.Langs;
@@ -18,7 +19,7 @@ public class Catalog extends PropertyChangeSupportBean {
 
 	private int type;
 	private Catalog parent;
-	private List<Catalog> children = new ArrayList<Catalog>();
+	private IObservableList children = new WritableList();
 
 	private Object value;
 
@@ -29,6 +30,24 @@ public class Catalog extends PropertyChangeSupportBean {
 	public Catalog(Object value) {
 		this.type = value instanceof ICatalog ? TYPE_CATALOG : TYPE_ITEM;
 		this.value = value;
+	}
+
+	@Override
+	public int hashCode() {
+		return type * 31 + (value != null ? value.hashCode() : 0);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Catalog)) {
+			return false;
+		} else if (type != ((Catalog) obj).type) {
+			return false;
+		} else if (value == null && ((Catalog) obj).value == null) {
+			return true;
+		} else {
+			return value != null && value.equals(((Catalog) obj).value);
+		}
 	}
 
 	public int getType() {
@@ -71,11 +90,12 @@ public class Catalog extends PropertyChangeSupportBean {
 		firePropertyChange("parent", this.parent, this.parent = parent);
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Catalog> getChildren() {
 		return children;
 	}
 
-	public void setChildren(List<Catalog> children) {
-		firePropertyChange("children", this.children, this.children = children);
+	public IObservableList getObservableChildren() {
+		return children;
 	}
 }
