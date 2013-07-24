@@ -10,7 +10,7 @@ public class CatalogEditorInput implements IEditorInput {
 	private Catalog catalog;
 
 	public CatalogEditorInput(Catalog catalog) {
-		if (catalog.getType() == Catalog.TYPE_ITEM) {
+		if (!catalog.isRoot() && !catalog.isSub()) {
 			this.catalog = catalog;
 		} else {
 			this.catalog = new Catalog(null);

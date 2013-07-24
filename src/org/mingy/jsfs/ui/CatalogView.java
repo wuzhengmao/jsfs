@@ -1,8 +1,5 @@
 package org.mingy.jsfs.ui;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.eclipse.core.databinding.beans.BeanProperties;
@@ -39,6 +36,7 @@ import org.mingy.jsfs.model.GoodsType;
 import org.mingy.jsfs.model.Position;
 import org.mingy.jsfs.model.Staff;
 import org.mingy.jsfs.ui.model.Catalog;
+import org.mingy.jsfs.ui.model.Catalogs;
 import org.mingy.kernel.context.GlobalBeanContext;
 import org.mingy.kernel.util.ApplicationException;
 import org.mingy.kernel.util.Langs;
@@ -54,13 +52,6 @@ public class CatalogView extends ViewPart {
 	private Action addAction;
 	private Action editAction;
 	private Action deleteAction;
-	private IStaffFacade staffFacade = GlobalBeanContext.getInstance().getBean(
-			IStaffFacade.class);
-	private IGoodsFacade goodsFacade = GlobalBeanContext.getInstance().getBean(
-			IGoodsFacade.class);
-	private static Catalog root;
-	private static Map<Object, Catalog> catalogs;
-	private static boolean inited = false;
 
 	/**
 	 * Create contents of the view part.
@@ -443,77 +434,22 @@ public class CatalogView extends ViewPart {
 	}
 
 	private void loadTree(boolean forceLoad) {
-		if (forceLoad || !inited) {
-			loadAll();
-			inited = true;
+		if (forceLoad || !Catalogs.isInited()) {
+			Catalogs.loadAll();
 		}
-		treeViewer.setInput(root);
+		treeViewer.setInput(Catalogs.getCatalog(Catalog.TYPE_ROOT));
 		for (IEditorReference editorRef : getSite().getPage()
 				.getEditorReferences()) {
 			IEditorPart editor = editorRef.getEditor(true);
 			if (editor instanceof AbstractFormEditor) {
 				Catalog catalog = (Catalog) editor.getEditorInput().getAdapter(
 						Catalog.class);
-				Catalog newCatalog = catalogs.get(catalog.getValue());
+				Catalog newCatalog = Catalogs.getCatalog(catalog.getValue());
 				if (newCatalog == null) {
 					getSite().getPage().closeEditor(editor, false);
 				} else {
 					((AbstractFormEditor<?>) editor)
 							.init(new CatalogEditorInput(newCatalog));
-				}
-			}
-		}
-	}
-
-	private void loadAll() {
-		root = new Catalog(Catalog.TYPE_ROOT);
-		Catalog staffCatalog = new Catalog(Catalog.TYPE_STAFF);
-		staffCatalog.setParent(root);
-		root.getChildren().add(staffCatalog);
-		Catalog goodsCatalog = new Catalog(Catalog.TYPE_GOODS);
-		goodsCatalog.setParent(root);
-		root.getChildren().add(goodsCatalog);
-		Catalog ruleCatalog = new Catalog(Catalog.TYPE_RULE);
-		ruleCatalog.setParent(root);
-		root.getChildren().add(ruleCatalog);
-		catalogs = new HashMap<Object, Catalog>();
-		loadStaffs(staffCatalog);
-		loadGoods(goodsCatalog);
-	}
-
-	private void loadStaffs(Catalog parent) {
-		for (Position position : staffFacade.getPositions()) {
-			Catalog catalog = new Catalog(position);
-			catalog.setParent(parent);
-			parent.getChildren().add(catalog);
-		}
-		for (Staff staff : staffFacade.getStaffs()) {
-			for (Catalog catalog : parent.getChildren()) {
-				if (catalog.getValue().equals(staff.getPosition())) {
-					Catalog child = new Catalog(staff);
-					child.setParent(catalog);
-					catalog.getChildren().add(child);
-					catalogs.put(staff, child);
-					break;
-				}
-			}
-		}
-	}
-
-	private void loadGoods(Catalog parent) {
-		for (GoodsType goodsType : goodsFacade.getGoodsTypes()) {
-			Catalog catalog = new Catalog(goodsType);
-			catalog.setParent(parent);
-			parent.getChildren().add(catalog);
-		}
-		for (Goods goods : goodsFacade.getGoods()) {
-			for (Catalog catalog : parent.getChildren()) {
-				if (catalog.getValue().equals(goods.getType())) {
-					Catalog child = new Catalog(goods);
-					child.setParent(catalog);
-					catalog.getChildren().add(child);
-					catalogs.put(goods, child);
-					break;
 				}
 			}
 		}

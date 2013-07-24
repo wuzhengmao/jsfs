@@ -76,5 +76,22 @@
             sequence="CTRL+L">
       </key>
    </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+         <wizard
+               id="org.mingy.jsfs.ui.NewStaffWizard"
+               name="员工"
+               class="org.mingy.jsfs.ui.NewStaffWizard"
+               canFinishEarly="true"
+               hasPages="false">
+         </wizard>
+         <wizard
+               id="org.mingy.jsfs.ui.NewGoodsWizard"
+               name="商品"
+               class="org.mingy.jsfs.ui.NewGoodsWizard"
+               canFinishEarly="true"
+               hasPages="false">
+         </wizard>
+   </extension>
  
 </plugin>

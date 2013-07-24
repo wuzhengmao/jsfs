@@ -10,6 +10,6 @@ public class CatalogToValueConverter extends Converter {
 
 	@Override
 	public Object convert(Object fromObject) {
-		return ((Catalog) fromObject).getValue();
+		return fromObject != null ? ((Catalog) fromObject).getValue() : null;
 	}
 }

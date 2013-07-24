@@ -19,6 +19,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	private IAction aboutAction;
 	private IAction quitAction;
+	private IAction newAction;
 	private IAction saveAction;
 	private IAction saveAllAction;
 	private IAction closeAction;
@@ -39,6 +40,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		{
 			quitAction = ActionFactory.QUIT.create(window);
 			register(quitAction);
+		}
+		{
+			newAction = ActionFactory.NEW_WIZARD_DROP_DOWN.create(window);
+			register(newAction);
 		}
 		{
 			saveAction = ActionFactory.SAVE.create(window);
@@ -78,6 +83,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				IWorkbenchActionConstants.M_HELP);
 
 		menuBar.add(fileMenu);
+		fileMenu.add(newAction);
+		fileMenu.add(new Separator());
 		fileMenu.add(closeAction);
 		fileMenu.add(closeAllAction);
 		fileMenu.add(new Separator());
@@ -97,6 +104,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void fillCoolBar(ICoolBarManager coolBar) {
 		IToolBarManager toolbar = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 		coolBar.add(new ToolBarContributionItem(toolbar, "main"));
+		toolbar.add(newAction);
+		toolbar.add(new Separator());
 		toolbar.add(saveAction);
 		toolbar.add(saveAllAction);
 		toolbar.add(new Separator());

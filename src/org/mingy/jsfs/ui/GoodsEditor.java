@@ -16,6 +16,7 @@ import org.mingy.jsfs.model.Goods;
 import org.mingy.jsfs.model.GoodsType;
 import org.mingy.jsfs.ui.model.Catalog;
 import org.mingy.jsfs.ui.model.CatalogToValueConverter;
+import org.mingy.jsfs.ui.model.Catalogs;
 import org.mingy.jsfs.ui.model.ValueToCatalogConverter;
 import org.mingy.kernel.context.GlobalBeanContext;
 
@@ -37,7 +38,9 @@ public class GoodsEditor extends AbstractFormEditor<Goods> {
 		if (goods != null) {
 			goods.copyTo(bean);
 		} else {
-			bean.setType((GoodsType) catalog.getParent().getValue());
+			if (catalog.getParent().isSub()) {
+				bean.setType((GoodsType) catalog.getParent().getValue());
+			}
 		}
 		return bean;
 	}
@@ -52,7 +55,7 @@ public class GoodsEditor extends AbstractFormEditor<Goods> {
 		Label label_4 = new Label(container, SWT.NONE);
 		label_4.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false,
 				1, 1));
-		label_4.setText("职位：");
+		label_4.setText("类型：");
 
 		cvType = new ComboViewer(container, SWT.READ_ONLY);
 		cvType.getCombo().setLayoutData(
@@ -99,8 +102,7 @@ public class GoodsEditor extends AbstractFormEditor<Goods> {
 				listContentProvider.getKnownElements(), Catalog.class, "label");
 		cvType.setLabelProvider(new ObservableMapLabelProvider(observeMap));
 		cvType.setContentProvider(listContentProvider);
-		Catalog catalog = (Catalog) getEditorInput().getAdapter(Catalog.class);
-		cvType.setInput(catalog.getParent().getParent().getChildren());
+		cvType.setInput(Catalogs.getCatalog(Catalog.TYPE_GOODS).getChildren());
 		bindSelection(cvType, bean, "type", new CatalogToValueConverter(
 				GoodsType.class), new ValueToCatalogConverter(GoodsType.class));
 		bindText(txtName, bean, "name");
@@ -129,7 +131,8 @@ public class GoodsEditor extends AbstractFormEditor<Goods> {
 		Catalog catalog = (Catalog) getEditorInput().getAdapter(Catalog.class);
 		if (catalog.getValue() == null) {
 			catalog.setValue(bean);
-			for (Catalog c : catalog.getParent().getParent().getChildren()) {
+			for (Catalog c : Catalogs.getCatalog(Catalog.TYPE_GOODS)
+					.getChildren()) {
 				if (c.getValue().equals(bean.getType())) {
 					catalog.setParent(c);
 					c.getChildren().add(catalog);
@@ -140,7 +143,8 @@ public class GoodsEditor extends AbstractFormEditor<Goods> {
 			bean.copyTo((Goods) catalog.getValue());
 			if (!catalog.getParent().getValue().equals(bean.getType())) {
 				catalog.getParent().getChildren().remove(catalog);
-				for (Catalog c : catalog.getParent().getParent().getChildren()) {
+				for (Catalog c : Catalogs.getCatalog(Catalog.TYPE_GOODS)
+						.getChildren()) {
 					if (c.getValue().equals(bean.getType())) {
 						catalog.setParent(c);
 						c.getChildren().add(catalog);

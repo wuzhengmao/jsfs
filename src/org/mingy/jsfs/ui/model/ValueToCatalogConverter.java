@@ -11,6 +11,7 @@ public class ValueToCatalogConverter extends Converter {
 
 	@Override
 	public Object convert(Object fromObject) {
-		return new Catalog((INamedObject) fromObject);
+		return fromObject != null ? new Catalog((INamedObject) fromObject)
+				: null;
 	}
 }

@@ -17,6 +17,7 @@ import org.mingy.jsfs.model.Position;
 import org.mingy.jsfs.model.Staff;
 import org.mingy.jsfs.ui.model.Catalog;
 import org.mingy.jsfs.ui.model.CatalogToValueConverter;
+import org.mingy.jsfs.ui.model.Catalogs;
 import org.mingy.jsfs.ui.model.ValueToCatalogConverter;
 import org.mingy.jsfs.ui.util.UIUtils;
 import org.mingy.kernel.context.GlobalBeanContext;
@@ -41,7 +42,9 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 		if (staff != null) {
 			staff.copyTo(bean);
 		} else {
-			bean.setPosition((Position) catalog.getParent().getValue());
+			if (catalog.getParent().isSub()) {
+				bean.setPosition((Position) catalog.getParent().getValue());
+			}
 		}
 		return bean;
 	}
@@ -129,8 +132,8 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 				listContentProvider.getKnownElements(), Catalog.class, "label");
 		cvPosition.setLabelProvider(new ObservableMapLabelProvider(observeMap));
 		cvPosition.setContentProvider(listContentProvider);
-		Catalog catalog = (Catalog) getEditorInput().getAdapter(Catalog.class);
-		cvPosition.setInput(catalog.getParent().getParent().getChildren());
+		cvPosition.setInput(Catalogs.getCatalog(Catalog.TYPE_STAFF)
+				.getChildren());
 		bindSelection(cvPosition, bean, "position",
 				new CatalogToValueConverter(Position.class),
 				new ValueToCatalogConverter(Position.class));
@@ -158,7 +161,8 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 		Catalog catalog = (Catalog) getEditorInput().getAdapter(Catalog.class);
 		if (catalog.getValue() == null) {
 			catalog.setValue(bean);
-			for (Catalog c : catalog.getParent().getParent().getChildren()) {
+			for (Catalog c : Catalogs.getCatalog(Catalog.TYPE_STAFF)
+					.getChildren()) {
 				if (c.getValue().equals(bean.getPosition())) {
 					catalog.setParent(c);
 					c.getChildren().add(catalog);
@@ -169,7 +173,8 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 			bean.copyTo((Staff) catalog.getValue());
 			if (!catalog.getParent().getValue().equals(bean.getPosition())) {
 				catalog.getParent().getChildren().remove(catalog);
-				for (Catalog c : catalog.getParent().getParent().getChildren()) {
+				for (Catalog c : Catalogs.getCatalog(Catalog.TYPE_STAFF)
+						.getChildren()) {
 					if (c.getValue().equals(bean.getPosition())) {
 						catalog.setParent(c);
 						c.getChildren().add(catalog);
