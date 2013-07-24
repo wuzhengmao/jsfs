@@ -34,38 +34,26 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void makeActions(final IWorkbenchWindow window) {
 		{
 			aboutAction = ActionFactory.ABOUT.create(window);
-			aboutAction.setText("关于(&A)");
-			aboutAction.setToolTipText("关于...");
 			register(aboutAction);
 		}
 		{
 			quitAction = ActionFactory.QUIT.create(window);
-			quitAction.setText("退出(&X)");
-			quitAction.setToolTipText("退出系统");
 			register(quitAction);
 		}
 		{
 			saveAction = ActionFactory.SAVE.create(window);
-			saveAction.setText("保存(&S)");
-			saveAction.setToolTipText("保存当前编辑窗口的修改");
 			register(saveAction);
 		}
 		{
 			saveAllAction = ActionFactory.SAVE_ALL.create(window);
-			saveAllAction.setText("全部保存(&A)");
-			saveAllAction.setToolTipText("保存所有编辑窗口的修改");
 			register(saveAllAction);
 		}
 		{
 			closeAction = ActionFactory.CLOSE.create(window);
-			closeAction.setText("关闭(&C)");
-			closeAction.setToolTipText("关闭当前编辑窗口");
 			register(closeAction);
 		}
 		{
 			closeAllAction = ActionFactory.CLOSE_ALL.create(window);
-			closeAllAction.setText("全部关闭");
-			closeAllAction.setToolTipText("关闭所有编辑窗口");
 			register(closeAllAction);
 		}
 		{

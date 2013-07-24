@@ -1,6 +1,6 @@
 package org.mingy.jsfs.ui;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.core.databinding.DataBindingContext;
@@ -32,7 +32,7 @@ public abstract class CatalogEditDialog extends TitleAreaDialog {
 	protected DataBindingContext dataBindingContext;
 	protected Text txtName;
 	protected Text txtDescription;
-	private Map<Control, ControlDecoration> decoratorMap = new HashMap<Control, ControlDecoration>();
+	private Map<Control, ControlDecoration> decoratorMap = new LinkedHashMap<Control, ControlDecoration>();
 
 	/**
 	 * Create the dialog.
@@ -155,7 +155,7 @@ public abstract class CatalogEditDialog extends TitleAreaDialog {
 			if (status.isOK()) {
 				for (ControlDecoration controlDecoration : decoratorMap
 						.values()) {
-					if (controlDecoration.isVisible()) {
+					if (controlDecoration.getDescriptionText() != null) {
 						getButton(IDialogConstants.OK_ID).setEnabled(false);
 						return status;
 					}

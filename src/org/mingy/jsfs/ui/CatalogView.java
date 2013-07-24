@@ -167,6 +167,18 @@ public class CatalogView extends ViewPart {
 		refreshAction = new Action() {
 			@Override
 			public void run() {
+				if (getSite().getPage().getDirtyEditors().length > 0) {
+					if (MessageDialog.openConfirm(getSite().getShell(),
+							Langs.getText("confirm.save.title"),
+							Langs.getText("confirm.save.message.onRefresh"))) {
+						getSite().getPage().saveAllEditors(false);
+						if (getSite().getPage().getDirtyEditors().length > 0) {
+							return;
+						}
+					} else {
+						return;
+					}
+				}
 				loadTree(true);
 			}
 		};
@@ -191,20 +203,14 @@ public class CatalogView extends ViewPart {
 					try {
 						switch (catalog.getParent().getType()) {
 						case Catalog.TYPE_STAFF:
-							getSite()
-									.getWorkbenchWindow()
-									.getActivePage()
-									.openEditor(
-											new CatalogEditorInput(catalog),
-											StaffEditor.ID);
+							getSite().getPage().openEditor(
+									new CatalogEditorInput(catalog),
+									StaffEditor.ID);
 							break;
 						case Catalog.TYPE_GOODS:
-							getSite()
-									.getWorkbenchWindow()
-									.getActivePage()
-									.openEditor(
-											new CatalogEditorInput(catalog),
-											GoodsEditor.ID);
+							getSite().getPage().openEditor(
+									new CatalogEditorInput(catalog),
+									GoodsEditor.ID);
 							break;
 						}
 					} catch (PartInitException e) {
@@ -249,20 +255,14 @@ public class CatalogView extends ViewPart {
 					try {
 						switch (catalog.getParent().getParent().getType()) {
 						case Catalog.TYPE_STAFF:
-							getSite()
-									.getWorkbenchWindow()
-									.getActivePage()
-									.openEditor(
-											new CatalogEditorInput(catalog),
-											StaffEditor.ID);
+							getSite().getPage().openEditor(
+									new CatalogEditorInput(catalog),
+									StaffEditor.ID);
 							break;
 						case Catalog.TYPE_GOODS:
-							getSite()
-									.getWorkbenchWindow()
-									.getActivePage()
-									.openEditor(
-											new CatalogEditorInput(catalog),
-											GoodsEditor.ID);
+							getSite().getPage().openEditor(
+									new CatalogEditorInput(catalog),
+									GoodsEditor.ID);
 							break;
 						}
 					} catch (PartInitException e) {
@@ -369,12 +369,10 @@ public class CatalogView extends ViewPart {
 				GlobalBeanContext.getInstance().getBean(IStaffFacade.class)
 						.deleteStaff(staff.getId());
 				catalog.getParent().getChildren().remove(catalog);
-				IEditorPart editor = getSite().getWorkbenchWindow()
-						.getActivePage()
-						.findEditor(new CatalogEditorInput(catalog));
+				IEditorPart editor = getSite().getPage().findEditor(
+						new CatalogEditorInput(catalog));
 				if (editor != null) {
-					getSite().getWorkbenchWindow().getActivePage()
-							.closeEditor(editor, false);
+					getSite().getPage().closeEditor(editor, false);
 				}
 				return true;
 			} catch (Exception e) {
@@ -393,12 +391,10 @@ public class CatalogView extends ViewPart {
 				GlobalBeanContext.getInstance().getBean(IGoodsFacade.class)
 						.deleteGoods(goods.getId());
 				catalog.getParent().getChildren().remove(catalog);
-				IEditorPart editor = getSite().getWorkbenchWindow()
-						.getActivePage()
-						.findEditor(new CatalogEditorInput(catalog));
+				IEditorPart editor = getSite().getPage().findEditor(
+						new CatalogEditorInput(catalog));
 				if (editor != null) {
-					getSite().getWorkbenchWindow().getActivePage()
-							.closeEditor(editor, false);
+					getSite().getPage().closeEditor(editor, false);
 				}
 				return true;
 			} catch (Exception e) {
@@ -452,16 +448,15 @@ public class CatalogView extends ViewPart {
 			inited = true;
 		}
 		treeViewer.setInput(root);
-		for (IEditorReference editorRef : getSite().getWorkbenchWindow()
-				.getActivePage().getEditorReferences()) {
+		for (IEditorReference editorRef : getSite().getPage()
+				.getEditorReferences()) {
 			IEditorPart editor = editorRef.getEditor(true);
 			if (editor instanceof AbstractFormEditor) {
 				Catalog catalog = (Catalog) editor.getEditorInput().getAdapter(
 						Catalog.class);
 				Catalog newCatalog = catalogs.get(catalog.getValue());
 				if (newCatalog == null) {
-					getSite().getWorkbenchWindow().getActivePage()
-							.closeEditor(editor, false);
+					getSite().getPage().closeEditor(editor, false);
 				} else {
 					((AbstractFormEditor<?>) editor)
 							.init(new CatalogEditorInput(newCatalog));

@@ -1,6 +1,6 @@
 package org.mingy.jsfs.ui;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,7 +41,7 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 
 	protected DefaultModifyListener defaultModifyListener = new DefaultModifyListener();
 	protected DataBindingContext dataBindingContext;
-	private Map<Control, ControlDecoration> decoratorMap = new HashMap<Control, ControlDecoration>();
+	private Map<Control, ControlDecoration> decoratorMap = new LinkedHashMap<Control, ControlDecoration>();
 	private T bean;
 	private boolean dirty = false;
 	private boolean ignoreChange = false;
@@ -153,6 +153,25 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 				targetToModel, modelToTarget);
 	}
 
+	private boolean showError() {
+		StringBuilder sb = new StringBuilder();
+		for (ControlDecoration controlDecoration : decoratorMap.values()) {
+			if (controlDecoration.getDescriptionText() != null) {
+				if (sb.length() > 0)
+					sb.append("\n");
+				sb.append(controlDecoration.getDescriptionText());
+			}
+		}
+		if (sb.length() > 0) {
+			MessageDialog.openError(getSite().getShell(),
+					Langs.getText("error.input.title"),
+					Langs.getText("error.input.message", sb.toString()));
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	protected boolean validate(T bean) {
 		Set<ConstraintViolation<T>> violations = Validators.validate(bean);
 		if (!violations.isEmpty()) {
@@ -174,7 +193,7 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		fillData(bean);
-		if (validate(bean)) {
+		if (!showError() && validate(bean)) {
 			try {
 				save(bean);
 			} catch (Exception e) {
@@ -188,6 +207,8 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 			setDirty(false);
 			postSave(bean);
 			reset();
+		} else {
+			monitor.setCanceled(true);
 		}
 	}
 

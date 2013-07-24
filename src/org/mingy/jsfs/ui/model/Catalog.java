@@ -51,7 +51,8 @@ public class Catalog extends PropertyChangeSupportBean implements
 		} else if (type != ((Catalog) obj).type) {
 			return false;
 		} else if (value == null && ((Catalog) obj).value == null) {
-			return true;
+			return type == Catalog.TYPE_ITEM ? parent
+					.equals(((Catalog) obj).parent) : true;
 		} else {
 			return value != null && value.equals(((Catalog) obj).value);
 		}
