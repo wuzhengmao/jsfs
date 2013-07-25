@@ -24,7 +24,7 @@ public class RewardRule extends PropertyChangeSupportBean implements IIdentity,
 
 	private Goods goods;
 
-	@NotEmpty(message = "{details.NotEmpty}")
+	@NotEmpty(message = "{rule.details.NotEmpty}")
 	private List<RewardRuleDetail> details = new ArrayList<RewardRuleDetail>();
 
 	@Length(max = 100, message = "{desc.MaxLength}")
