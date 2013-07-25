@@ -34,9 +34,7 @@ public class Catalog extends PropertyChangeSupportBean implements
 	public Catalog(INamedObject value) {
 		this.type = value instanceof ICatalog ? TYPE_CATALOG : TYPE_ITEM;
 		this.value = value;
-		if (this.value != null) {
-			this.value.addNameChangeListener(this);
-		}
+		this.value.addNameChangeListener(this);
 	}
 
 	@Override

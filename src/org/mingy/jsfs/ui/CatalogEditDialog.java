@@ -4,30 +4,24 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.databinding.beans.PojoProperties;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.mingy.jsfs.Activator;
-import org.mingy.jsfs.ui.util.Jsr303BeanValidator;
+import org.mingy.jsfs.ui.util.IAggregateValidateListener;
+import org.mingy.jsfs.ui.util.UIUtils;
 
-public abstract class CatalogEditDialog extends TitleAreaDialog {
+public abstract class CatalogEditDialog extends TitleAreaDialog implements
+		IAggregateValidateListener {
 
 	protected DataBindingContext dataBindingContext;
 	protected Text txtName;
@@ -89,9 +83,6 @@ public abstract class CatalogEditDialog extends TitleAreaDialog {
 		gd_txtDescription.heightHint = 108;
 		txtDescription.setLayoutData(gd_txtDescription);
 
-		dataBindingContext = new DataBindingContext();
-		initDataBindings();
-
 		return area;
 	}
 
@@ -102,13 +93,18 @@ public abstract class CatalogEditDialog extends TitleAreaDialog {
 	 */
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
-		Button button = createButton(parent, IDialogConstants.OK_ID,
-				IDialogConstants.OK_LABEL, true);
-		button.setText("确定");
-		button.setEnabled(false);
-		Button button_1 = createButton(parent, IDialogConstants.CANCEL_ID,
+		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
+				true);
+		createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
-		button_1.setText("取消");
+	}
+
+	@Override
+	protected Control createContents(Composite parent) {
+		Control contents = super.createContents(parent);
+		dataBindingContext = new DataBindingContext();
+		initDataBindings();
+		return contents;
 	}
 
 	/**
@@ -119,53 +115,14 @@ public abstract class CatalogEditDialog extends TitleAreaDialog {
 		return new Point(450, 300);
 	}
 
-	protected ControlDecoration createControlDecoration(Control control) {
-		ControlDecoration controlDecoration = new ControlDecoration(control,
-				SWT.LEFT | SWT.TOP);
-		FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
-				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
-		controlDecoration.setImage(fieldDecoration.getImage());
-		controlDecoration.hide();
-		decoratorMap.put(control, controlDecoration);
-		return controlDecoration;
+	@Override
+	public void onValidateFinish(boolean passed) {
+		getButton(IDialogConstants.OK_ID).setEnabled(passed);
 	}
 
 	protected void bindText(Control control, Object bean, String propName) {
-		IObservableValue observeWidget = WidgetProperties.text(SWT.Modify)
-				.observe(control);
-		IObservableValue observeValue = PojoProperties.value(propName).observe(
-				bean);
-		UpdateValueStrategy strategy = new UpdateValueStrategy();
-		strategy.setAfterConvertValidator(new MyJsr303BeanValidator(bean
-				.getClass(), propName, createControlDecoration(control)));
-		dataBindingContext.bindValue(observeWidget, observeValue, strategy,
-				null);
-	}
-
-	private class MyJsr303BeanValidator extends Jsr303BeanValidator {
-
-		public MyJsr303BeanValidator(Class<?> clazz, String propName,
-				ControlDecoration controlDecoration) {
-			super(clazz, propName, controlDecoration);
-		}
-
-		@Override
-		public IStatus validate(Object value) {
-			IStatus status = super.validate(value);
-			if (status.isOK()) {
-				for (ControlDecoration controlDecoration : decoratorMap
-						.values()) {
-					if (controlDecoration.getDescriptionText() != null) {
-						getButton(IDialogConstants.OK_ID).setEnabled(false);
-						return status;
-					}
-				}
-				getButton(IDialogConstants.OK_ID).setEnabled(true);
-			} else {
-				getButton(IDialogConstants.OK_ID).setEnabled(false);
-			}
-			return status;
-		}
+		UIUtils.bindText(dataBindingContext, control, bean, propName, null,
+				null, decoratorMap, this);
 	}
 
 	protected abstract String getDialogTitle();

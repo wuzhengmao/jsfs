@@ -13,7 +13,7 @@ public class CatalogEditorInput implements IEditorInput {
 		if (!catalog.isRoot() && !catalog.isSub()) {
 			this.catalog = catalog;
 		} else {
-			this.catalog = new Catalog(null);
+			this.catalog = new Catalog(Catalog.TYPE_ITEM);
 			this.catalog.setParent(catalog);
 		}
 	}

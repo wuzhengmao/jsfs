@@ -159,30 +159,7 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 	@Override
 	protected void postSave(Staff bean) {
 		Catalog catalog = (Catalog) getEditorInput().getAdapter(Catalog.class);
-		if (catalog.getValue() == null) {
-			catalog.setValue(bean);
-			for (Catalog c : Catalogs.getCatalog(Catalog.TYPE_STAFF)
-					.getChildren()) {
-				if (c.getValue().equals(bean.getPosition())) {
-					catalog.setParent(c);
-					c.getChildren().add(catalog);
-					break;
-				}
-			}
-		} else {
-			bean.copyTo((Staff) catalog.getValue());
-			if (!catalog.getParent().getValue().equals(bean.getPosition())) {
-				catalog.getParent().getChildren().remove(catalog);
-				for (Catalog c : Catalogs.getCatalog(Catalog.TYPE_STAFF)
-						.getChildren()) {
-					if (c.getValue().equals(bean.getPosition())) {
-						catalog.setParent(c);
-						c.getChildren().add(catalog);
-						break;
-					}
-				}
-			}
-		}
+		Catalogs.updateCatalog(catalog, bean);
 	}
 
 	@Override

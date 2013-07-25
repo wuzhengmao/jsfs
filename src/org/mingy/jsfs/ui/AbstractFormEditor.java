@@ -2,27 +2,16 @@ package org.mingy.jsfs.ui;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
 
 import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
-import org.eclipse.core.databinding.UpdateValueStrategy;
-import org.eclipse.core.databinding.beans.PojoProperties;
 import org.eclipse.core.databinding.conversion.Converter;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.databinding.swt.WidgetProperties;
-import org.eclipse.jface.databinding.viewers.ViewerProperties;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -33,9 +22,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
-import org.mingy.jsfs.ui.util.Jsr303BeanValidator;
+import org.mingy.jsfs.ui.util.UIUtils;
 import org.mingy.kernel.util.Langs;
-import org.mingy.kernel.util.Validators;
 
 public abstract class AbstractFormEditor<T> extends EditorPart {
 
@@ -101,71 +89,34 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 
 	protected abstract void postSave(T bean);
 
-	protected ControlDecoration createControlDecoration(Control control) {
-		ControlDecoration controlDecoration = new ControlDecoration(control,
-				SWT.LEFT | SWT.TOP);
-		FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
-				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
-		controlDecoration.setImage(fieldDecoration.getImage());
-		controlDecoration.hide();
-		decoratorMap.put(control, controlDecoration);
-		return controlDecoration;
-	}
-
 	protected void bindText(Control control, Object bean, String propName) {
-		IObservableValue observeWidget = WidgetProperties.text(SWT.Modify)
-				.observe(control);
-		bind(observeWidget, control, bean, propName, null, null);
+		UIUtils.bindText(dataBindingContext, control, bean, propName,
+				decoratorMap);
 	}
 
 	protected void bindSelection(Control control, Object bean, String propName) {
-		IObservableValue observeWidget = WidgetProperties.selection().observe(
-				control);
-		bind(observeWidget, control, bean, propName, null, null);
+		UIUtils.bindSelection(dataBindingContext, control, bean, propName,
+				decoratorMap);
 	}
 
 	protected void bindSelection(Viewer viewer, Object bean, String propName) {
-		IObservableValue observeWidget = ViewerProperties.singleSelection()
-				.observe(viewer);
-		bind(observeWidget, viewer.getControl(), bean, propName, null, null);
+		UIUtils.bindSelection(dataBindingContext, viewer, bean, propName,
+				decoratorMap);
 	}
 
 	protected void bindSelection(Viewer viewer, Object bean, String propName,
 			Converter targetToModelConverter, Converter modelToTargetConverter) {
-		IObservableValue observeWidget = ViewerProperties.singleSelection()
-				.observe(viewer);
-		bind(observeWidget, viewer.getControl(), bean, propName,
-				targetToModelConverter, modelToTargetConverter);
-	}
-
-	private void bind(IObservableValue observeWidget, Control control,
-			Object bean, String propName, Converter targetToModelConverter,
-			Converter modelToTargetConverter) {
-		IObservableValue observeValue = PojoProperties.value(propName).observe(
-				bean);
-		UpdateValueStrategy targetToModel = new UpdateValueStrategy();
-		targetToModel.setConverter(targetToModelConverter);
-		targetToModel.setAfterConvertValidator(new Jsr303BeanValidator(bean
-				.getClass(), propName, createControlDecoration(control)));
-		UpdateValueStrategy modelToTarget = new UpdateValueStrategy();
-		modelToTarget.setConverter(modelToTargetConverter);
-		dataBindingContext.bindValue(observeWidget, observeValue,
-				targetToModel, modelToTarget);
+		UIUtils.bindSelection(dataBindingContext, viewer, bean, propName,
+				targetToModelConverter, modelToTargetConverter, decoratorMap);
 	}
 
 	private boolean showError() {
-		StringBuilder sb = new StringBuilder();
-		for (ControlDecoration controlDecoration : decoratorMap.values()) {
-			if (controlDecoration.getDescriptionText() != null) {
-				if (sb.length() > 0)
-					sb.append("\n");
-				sb.append(controlDecoration.getDescriptionText());
-			}
-		}
-		if (sb.length() > 0) {
+		String error = UIUtils.getErrorMessage(decoratorMap);
+		if (error != null) {
+			getSite().getPage().activate(this);
 			MessageDialog.openError(getSite().getShell(),
 					Langs.getText("error.input.title"),
-					Langs.getText("error.input.message", sb.toString()));
+					Langs.getText("error.input.message", error));
 			return true;
 		} else {
 			return false;
@@ -173,17 +124,12 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 	}
 
 	protected boolean validate(T bean) {
-		Set<ConstraintViolation<T>> violations = Validators.validate(bean);
-		if (!violations.isEmpty()) {
-			StringBuilder sb = new StringBuilder();
-			for (ConstraintViolation<T> violation : violations) {
-				if (sb.length() > 0)
-					sb.append("\n");
-				sb.append(violation.getMessage());
-			}
+		String error = UIUtils.validate(bean);
+		if (error != null) {
+			getSite().getPage().activate(this);
 			MessageDialog.openError(getSite().getShell(),
 					Langs.getText("error.input.title"),
-					Langs.getText("error.input.message", sb.toString()));
+					Langs.getText("error.input.message", error));
 			return false;
 		} else {
 			return true;

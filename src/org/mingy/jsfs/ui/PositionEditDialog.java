@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.mingy.jsfs.facade.IStaffFacade;
 import org.mingy.jsfs.model.Position;
 import org.mingy.jsfs.ui.model.Catalog;
+import org.mingy.jsfs.ui.model.Catalogs;
 import org.mingy.kernel.context.GlobalBeanContext;
 import org.mingy.kernel.util.Langs;
 
@@ -18,7 +19,7 @@ public class PositionEditDialog extends CatalogEditDialog {
 		super(parentShell);
 		this.position = new Position();
 		if (catalog.isRoot()) {
-			this.catalog = new Catalog(position);
+			this.catalog = new Catalog(Catalog.TYPE_CATALOG);
 			this.catalog.setParent(catalog);
 		} else {
 			this.catalog = catalog;
@@ -58,10 +59,7 @@ public class PositionEditDialog extends CatalogEditDialog {
 							+ ": " + e.getLocalizedMessage()));
 			return false;
 		}
-		position.copyTo((Position) catalog.getValue());
-		if (!editMode) {
-			catalog.getParent().getChildren().add(catalog);
-		}
+		Catalogs.updateCatalog(catalog, position);
 		return true;
 	}
 }

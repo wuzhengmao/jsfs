@@ -70,7 +70,7 @@ public class SalesLog {
 		private Goods goods;
 
 		@NotNull(message = "{count.NotNull}")
-		@Min(value = 1, message = "{count.largeThanZero}")
+		@Min(value = 1, message = "{count.largerThanZero}")
 		private Integer count;
 
 		@NotNull(message = "{totalPrice.NotNull}")

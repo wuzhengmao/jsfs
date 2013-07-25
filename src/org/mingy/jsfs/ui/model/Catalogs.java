@@ -1,8 +1,10 @@
 package org.mingy.jsfs.ui.model;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.databinding.observable.list.WritableList;
 import org.mingy.jsfs.facade.IGoodsFacade;
 import org.mingy.jsfs.facade.IStaffFacade;
 import org.mingy.jsfs.model.Goods;
@@ -20,6 +22,10 @@ public abstract class Catalogs {
 
 	private static Catalog root;
 	private static Map<Object, Catalog> catalogs;
+	@SuppressWarnings("unchecked")
+	private static List<Staff> staffList = new WritableList();
+	@SuppressWarnings("unchecked")
+	private static List<Goods> goodsList = new WritableList();
 	private static boolean inited = false;
 
 	public static boolean isInited() {
@@ -38,6 +44,8 @@ public abstract class Catalogs {
 		ruleCatalog.setParent(root);
 		root.getChildren().add(ruleCatalog);
 		catalogs = new HashMap<Object, Catalog>();
+		staffList.clear();
+		goodsList.clear();
 		loadStaffs(staffCatalog);
 		loadGoods(goodsCatalog);
 		inited = true;
@@ -56,6 +64,7 @@ public abstract class Catalogs {
 					child.setParent(catalog);
 					catalog.getChildren().add(child);
 					catalogs.put(staff, child);
+					staffList.add(staff);
 					break;
 				}
 			}
@@ -75,10 +84,110 @@ public abstract class Catalogs {
 					child.setParent(catalog);
 					catalog.getChildren().add(child);
 					catalogs.put(goods, child);
+					goodsList.add(goods);
 					break;
 				}
 			}
 		}
+	}
+
+	public static void updateCatalog(Catalog catalog, Position position) {
+		if (catalog.getValue() == null) {
+			catalog.setValue(position);
+			getCatalog(Catalog.TYPE_STAFF).getChildren().add(catalog);
+		} else if (position != catalog.getValue()) {
+			position.copyTo((Position) catalog.getValue());
+		}
+	}
+
+	public static void updateCatalog(Catalog catalog, Staff staff) {
+		if (catalog.getValue() == null) {
+			catalog.setValue(staff);
+			for (Catalog c : getCatalog(Catalog.TYPE_STAFF).getChildren()) {
+				if (c.getValue().equals(staff.getPosition())) {
+					catalog.setParent(c);
+					c.getChildren().add(catalog);
+					catalogs.put(staff, catalog);
+					staffList.add(staff);
+					break;
+				}
+			}
+		} else {
+			if (staff != catalog.getValue()) {
+				staff.copyTo((Staff) catalog.getValue());
+				staff = (Staff) catalog.getValue();
+			}
+			if (!catalog.getParent().getValue().equals(staff.getPosition())) {
+				catalog.getParent().getChildren().remove(catalog);
+				for (Catalog c : Catalogs.getCatalog(Catalog.TYPE_STAFF)
+						.getChildren()) {
+					if (c.getValue().equals(staff.getPosition())) {
+						catalog.setParent(c);
+						c.getChildren().add(catalog);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	public static void updateCatalog(Catalog catalog, GoodsType goodsType) {
+		if (catalog.getValue() == null) {
+			catalog.setValue(goodsType);
+			getCatalog(Catalog.TYPE_GOODS).getChildren().add(catalog);
+		} else if (goodsType != catalog.getValue()) {
+			goodsType.copyTo((GoodsType) catalog.getValue());
+		}
+	}
+
+	public static void updateCatalog(Catalog catalog, Goods goods) {
+		if (catalog.getValue() == null) {
+			catalog.setValue(goods);
+			for (Catalog c : getCatalog(Catalog.TYPE_GOODS).getChildren()) {
+				if (c.getValue().equals(goods.getType())) {
+					catalog.setParent(c);
+					c.getChildren().add(catalog);
+					catalogs.put(goods, catalog);
+					goodsList.add(goods);
+					break;
+				}
+			}
+		} else {
+			if (goods != catalog.getValue()) {
+				goods.copyTo((Goods) catalog.getValue());
+				goods = (Goods) catalog.getValue();
+			}
+			if (!catalog.getParent().getValue().equals(goods.getType())) {
+				catalog.getParent().getChildren().remove(catalog);
+				for (Catalog c : getCatalog(Catalog.TYPE_GOODS).getChildren()) {
+					if (c.getValue().equals(goods.getType())) {
+						catalog.setParent(c);
+						c.getChildren().add(catalog);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	public static void removeCatalog(Catalog catalog, Position position) {
+		catalog.getParent().getChildren().remove(catalog);
+	}
+
+	public static void removeCatalog(Catalog catalog, Staff staff) {
+		catalog.getParent().getChildren().remove(catalog);
+		catalogs.remove(staff);
+		staffList.remove(staff);
+	}
+
+	public static void removeCatalog(Catalog catalog, GoodsType goodsType) {
+		catalog.getParent().getChildren().remove(catalog);
+	}
+
+	public static void removeCatalog(Catalog catalog, Goods goods) {
+		catalog.getParent().getChildren().remove(catalog);
+		catalogs.remove(goods);
+		goodsList.remove(goods);
 	}
 
 	public static Catalog getCatalog(int type) {
@@ -96,5 +205,13 @@ public abstract class Catalogs {
 
 	public static Catalog getCatalog(Object value) {
 		return catalogs.get(value);
+	}
+
+	public static List<Staff> getStaffList() {
+		return staffList;
+	}
+
+	public static List<Goods> getGoodsList() {
+		return goodsList;
 	}
 }

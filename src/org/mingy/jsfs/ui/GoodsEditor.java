@@ -129,30 +129,7 @@ public class GoodsEditor extends AbstractFormEditor<Goods> {
 	@Override
 	protected void postSave(Goods bean) {
 		Catalog catalog = (Catalog) getEditorInput().getAdapter(Catalog.class);
-		if (catalog.getValue() == null) {
-			catalog.setValue(bean);
-			for (Catalog c : Catalogs.getCatalog(Catalog.TYPE_GOODS)
-					.getChildren()) {
-				if (c.getValue().equals(bean.getType())) {
-					catalog.setParent(c);
-					c.getChildren().add(catalog);
-					break;
-				}
-			}
-		} else {
-			bean.copyTo((Goods) catalog.getValue());
-			if (!catalog.getParent().getValue().equals(bean.getType())) {
-				catalog.getParent().getChildren().remove(catalog);
-				for (Catalog c : Catalogs.getCatalog(Catalog.TYPE_GOODS)
-						.getChildren()) {
-					if (c.getValue().equals(bean.getType())) {
-						catalog.setParent(c);
-						c.getChildren().add(catalog);
-						break;
-					}
-				}
-			}
-		}
+		Catalogs.updateCatalog(catalog, bean);
 	}
 
 	@Override

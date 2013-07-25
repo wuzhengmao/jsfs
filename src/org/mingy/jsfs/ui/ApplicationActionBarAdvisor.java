@@ -25,6 +25,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IAction closeAction;
 	private IAction closeAllAction;
 	private IAction openCatalogAction;
+	private IAction querySalesLogAction;
 	private IAction openConsoleAction;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
@@ -67,6 +68,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			register(openCatalogAction);
 		}
 		{
+			querySalesLogAction = new QuerySalesLogAction(window,
+					"查询销售记录(&Q)...");
+			querySalesLogAction.setToolTipText("查询销售记录");
+			register(querySalesLogAction);
+		}
+		{
 			openConsoleAction = new OpenConsoleAction(window, "控制台(&L)");
 			openConsoleAction.setToolTipText("打开控制台输出日志");
 			register(openConsoleAction);
@@ -94,6 +101,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(quitAction);
 		menuBar.add(windowMenu);
 		windowMenu.add(openCatalogAction);
+		windowMenu.add(querySalesLogAction);
 		windowMenu.add(new Separator());
 		windowMenu.add(openConsoleAction);
 		menuBar.add(helpMenu);
@@ -110,6 +118,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		toolbar.add(saveAllAction);
 		toolbar.add(new Separator());
 		toolbar.add(openCatalogAction);
+		toolbar.add(querySalesLogAction);
 		toolbar.add(new Separator());
 		toolbar.add(openConsoleAction);
 	}

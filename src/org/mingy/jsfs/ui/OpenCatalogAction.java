@@ -31,10 +31,10 @@ public class OpenCatalogAction extends Action {
 					IWorkbenchPage.VIEW_VISIBLE);
 		} catch (PartInitException e) {
 			if (logger.isErrorEnabled()) {
-				logger.error("error on open resource", e);
+				logger.error("error on open view", e);
 			}
 			MessageDialog.openError(window.getShell(), "Error",
-					"Error opening resource:" + e.getLocalizedMessage());
+					"Error opening view:" + e.getLocalizedMessage());
 		}
 	}
 }
