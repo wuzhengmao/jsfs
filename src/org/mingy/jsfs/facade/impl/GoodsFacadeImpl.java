@@ -57,21 +57,26 @@ public class GoodsFacadeImpl implements IGoodsFacade {
 				new String[] { "type.id", "valid" }) != null) {
 			throw new ApplicationException(
 					"error.delete_goodsType.goodsNotEmpty");
-		} else if (!entityDao.query(
-				"SELECT e.id FROM RewardRuleEntity e WHERE e.goodsType.id = ?1",
-				new Object[] { id }, false, 0, 1).isEmpty()) {
+		} else if (!entityDao
+				.query("SELECT e.id FROM RewardRuleEntity e WHERE e.goodsType.id = ?1",
+						new Object[] { id }, false, 0, 1).isEmpty()) {
 			throw new ApplicationException("error.delete_goodsType.useInRule");
 		} else if (entityDao.load(GoodsEntity.class, id, "type.id") != null) {
 			entityDao.logicDelete(GoodsTypeEntity.class, id);
+			Caches.remove(GoodsType.class, id);
 		} else {
 			entityDao.delete(GoodsTypeEntity.class, id);
+			Caches.remove(GoodsType.class, id);
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Goods> getGoods() {
 		List<Goods> list = new ArrayList<Goods>();
-		for (GoodsEntity entity : entityDao.loadAll(GoodsEntity.class, true)) {
+		for (GoodsEntity entity : (List<GoodsEntity>) entityDao
+				.query("SELECT e FROM GoodsEntity e WHERE e.valid = true ORDER BY e.type.id, e.id",
+						(Object[]) null, false)) {
 			Goods goods = Caches.load(Goods.class, entity.getId());
 			if (goods == null) {
 				goods = new Goods();
@@ -121,13 +126,18 @@ public class GoodsFacadeImpl implements IGoodsFacade {
 
 	@Override
 	public void deleteGoods(Long id) {
-		// TODO: 逻辑删除
 		if (!entityDao.query(
 				"SELECT e.id FROM RewardRuleEntity e WHERE e.goods.id = ?1",
 				new Object[] { id }, false, 0, 1).isEmpty()) {
 			throw new ApplicationException("error.delete_goods.useInRule");
+		} else if (!entityDao
+				.query("SELECT e.id FROM SalesLogDetailEntity e WHERE e.goods.id = ?1",
+						new Object[] { id }, false, 0, 1).isEmpty()) {
+			entityDao.logicDelete(GoodsEntity.class, id);
+			Caches.remove(Goods.class, id);
 		} else {
 			entityDao.delete(GoodsEntity.class, id);
+			Caches.remove(Goods.class, id);
 		}
 	}
 

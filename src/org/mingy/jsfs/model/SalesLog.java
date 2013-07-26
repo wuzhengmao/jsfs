@@ -1,12 +1,13 @@
 package org.mingy.jsfs.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+import org.eclipse.core.databinding.observable.list.IObservableList;
+import org.eclipse.core.databinding.observable.list.WritableList;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -21,10 +22,10 @@ public class SalesLog {
 	private Staff staff;
 
 	@NotEmpty(message = "{salesLog.details.NotEmpty}")
-	private List<SalesLogDetail> details = new ArrayList<SalesLogDetail>();
+	private IObservableList details = new WritableList();
 
-	@Length(max = 100, message = "{desc.MaxLength}")
-	private String description;
+	@Length(max = 100, message = "{memo.MaxLength}")
+	private String memo;
 
 	public Long getId() {
 		return id;
@@ -50,16 +51,21 @@ public class SalesLog {
 		this.staff = staff;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
+	@SuppressWarnings("unchecked")
 	public List<SalesLogDetail> getDetails() {
 		return details;
+	}
+	
+	public IObservableList getObservableDetails() {
+		return details;
+	}
+
+	public String getMemo() {
+		return memo;
+	}
+
+	public void setMemo(String memo) {
+		this.memo = memo;
 	}
 
 	public class SalesLogDetail {
@@ -70,10 +76,11 @@ public class SalesLog {
 		private Goods goods;
 
 		@NotNull(message = "{count.NotNull}")
-		@Min(value = 1, message = "{count.largerThanZero}")
+		@Min(value = 1, message = "{count.LargerThanZero}")
 		private Integer count;
 
 		@NotNull(message = "{totalPrice.NotNull}")
+		@Min(value = 0, message = "{totalPrice.NotLessThanZero}")
 		private Double totalPrice;
 
 		public Long getId() {

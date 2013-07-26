@@ -23,7 +23,11 @@ public abstract class Catalogs {
 	private static Catalog root;
 	private static Map<Object, Catalog> catalogs;
 	@SuppressWarnings("unchecked")
+	private static List<Position> positionList = new WritableList();
+	@SuppressWarnings("unchecked")
 	private static List<Staff> staffList = new WritableList();
+	@SuppressWarnings("unchecked")
+	private static List<GoodsType> goodsTypeList = new WritableList();
 	@SuppressWarnings("unchecked")
 	private static List<Goods> goodsList = new WritableList();
 	private static boolean inited = false;
@@ -44,7 +48,9 @@ public abstract class Catalogs {
 		ruleCatalog.setParent(root);
 		root.getChildren().add(ruleCatalog);
 		catalogs = new HashMap<Object, Catalog>();
+		positionList.clear();
 		staffList.clear();
+		goodsTypeList.clear();
 		goodsList.clear();
 		loadStaffs(staffCatalog);
 		loadGoods(goodsCatalog);
@@ -56,6 +62,8 @@ public abstract class Catalogs {
 			Catalog catalog = new Catalog(position);
 			catalog.setParent(parent);
 			parent.getChildren().add(catalog);
+			catalogs.put(position, catalog);
+			positionList.add(position);
 		}
 		for (Staff staff : staffFacade.getStaffs()) {
 			for (Catalog catalog : parent.getChildren()) {
@@ -76,6 +84,8 @@ public abstract class Catalogs {
 			Catalog catalog = new Catalog(goodsType);
 			catalog.setParent(parent);
 			parent.getChildren().add(catalog);
+			catalogs.put(goodsType, catalog);
+			goodsTypeList.add(goodsType);
 		}
 		for (Goods goods : goodsFacade.getGoods()) {
 			for (Catalog catalog : parent.getChildren()) {
@@ -95,6 +105,8 @@ public abstract class Catalogs {
 		if (catalog.getValue() == null) {
 			catalog.setValue(position);
 			getCatalog(Catalog.TYPE_STAFF).getChildren().add(catalog);
+			catalogs.put(position, catalog);
+			positionList.add(position);
 		} else if (position != catalog.getValue()) {
 			position.copyTo((Position) catalog.getValue());
 		}
@@ -135,6 +147,8 @@ public abstract class Catalogs {
 		if (catalog.getValue() == null) {
 			catalog.setValue(goodsType);
 			getCatalog(Catalog.TYPE_GOODS).getChildren().add(catalog);
+			catalogs.put(goodsType, catalog);
+			goodsTypeList.add(goodsType);
 		} else if (goodsType != catalog.getValue()) {
 			goodsType.copyTo((GoodsType) catalog.getValue());
 		}
@@ -172,6 +186,8 @@ public abstract class Catalogs {
 
 	public static void removeCatalog(Catalog catalog, Position position) {
 		catalog.getParent().getChildren().remove(catalog);
+		catalogs.remove(position);
+		positionList.remove(position);
 	}
 
 	public static void removeCatalog(Catalog catalog, Staff staff) {
@@ -182,6 +198,8 @@ public abstract class Catalogs {
 
 	public static void removeCatalog(Catalog catalog, GoodsType goodsType) {
 		catalog.getParent().getChildren().remove(catalog);
+		catalogs.remove(goodsType);
+		goodsTypeList.remove(goodsType);
 	}
 
 	public static void removeCatalog(Catalog catalog, Goods goods) {
@@ -207,8 +225,16 @@ public abstract class Catalogs {
 		return catalogs.get(value);
 	}
 
+	public static List<Position> getPositionList() {
+		return positionList;
+	}
+
 	public static List<Staff> getStaffList() {
 		return staffList;
+	}
+
+	public static List<GoodsType> getGoodsTypeList() {
+		return goodsTypeList;
 	}
 
 	public static List<Goods> getGoodsList() {

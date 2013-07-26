@@ -60,7 +60,7 @@ public class SalesLogQueryConditionInputDialog extends TitleAreaDialog
 		super.configureShell(newShell);
 		newShell.setImage(Activator.getImageDescriptor(
 				"/icons/query_sales_log.gif").createImage());
-		newShell.setText("查询销售记录");
+		newShell.setText(Langs.getText("query_salesLog.dialog.title"));
 	}
 
 	/**
@@ -72,8 +72,8 @@ public class SalesLogQueryConditionInputDialog extends TitleAreaDialog
 	protected Control createDialogArea(Composite parent) {
 		setTitleImage(Activator.getImageDescriptor(
 				"/icons/query_sales_log_wiz.gif").createImage());
-		setTitle("查询销售记录");
-		setMessage("输入查询条件，查询符合条件的销售记录。");
+		setTitle(Langs.getText("query_salesLog.dialog.title"));
+		setMessage(Langs.getText("query_salesLog.dialog.message"));
 
 		Composite area = (Composite) super.createDialogArea(parent);
 		Composite container = new Composite(area, SWT.NONE);

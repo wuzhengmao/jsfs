@@ -10,6 +10,7 @@ package org.mingy.jsfs.ui;
 public interface ICommandIds {
 
 	public static final String CMD_OPEN_CATALOG = "org.mingy.jsfs.ui.openCatalog";
+	public static final String CMD_INPUT_SALES_LOG = "org.mingy.jsfs.ui.inputSalesLog";
 	public static final String CMD_QUERY_SALES_LOG = "org.mingy.jsfs.ui.querySalesLog";
 	public static final String CMD_OPEN_CONSOLE = "org.mingy.jsfs.ui.openConsole";
 

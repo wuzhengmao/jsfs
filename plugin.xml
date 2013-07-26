@@ -47,6 +47,11 @@
             description="打开目录浏览视图"
             id="org.mingy.jsfs.ui.openCatalog">
       </command>
+       <command
+            name="输入销售记录..."
+            description="输入一条销售记录"
+            id="org.mingy.jsfs.ui.inputSalesLog">
+      </command>
       <command
             name="查询销售记录..."
             description="根据输入条件查询销售记录"
@@ -64,6 +69,11 @@
             commandId="org.mingy.jsfs.ui.openCatalog"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="CTRL+R">
+      </key>
+      <key
+            commandId="org.mingy.jsfs.ui.inputSalesLog"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="CTRL+I">
       </key>
       <key
             commandId="org.mingy.jsfs.ui.openConsole"

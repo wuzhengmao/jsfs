@@ -14,4 +14,8 @@
 		<property name="entityDao" ref="entityDao" />
 	</bean>
 
+	<bean id="salesLogFacade" class="org.mingy.jsfs.facade.impl.SalesLogFacadeImpl">
+		<property name="entityDao" ref="entityDao" />
+	</bean>
+
 </beans>

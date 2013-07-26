@@ -49,6 +49,7 @@ public class Jsr303BeanValidator implements IValidator {
 			return ValidationStatus.error(errorText);
 		} else {
 			if (controlDecoration != null) {
+				controlDecoration.hideHover();
 				controlDecoration.hide();
 				controlDecoration.setDescriptionText(null);
 			}

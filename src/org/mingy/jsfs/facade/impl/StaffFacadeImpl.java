@@ -63,16 +63,20 @@ public class StaffFacadeImpl implements IStaffFacade {
 			throw new ApplicationException("error.delete_position.useInRule");
 		} else if (entityDao.load(StaffEntity.class, id, "position.id") != null) {
 			entityDao.logicDelete(PositionEntity.class, id);
+			Caches.remove(Position.class, id);
 		} else {
 			entityDao.delete(PositionEntity.class, id);
 			Caches.remove(Position.class, id);
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Staff> getStaffs() {
 		List<Staff> list = new ArrayList<Staff>();
-		for (StaffEntity entity : entityDao.loadAll(StaffEntity.class, true)) {
+		for (StaffEntity entity : (List<StaffEntity>) entityDao
+				.query("SELECT e FROM StaffEntity e WHERE e.valid = true ORDER BY e.position.id, e.id",
+						(Object[]) null, false)) {
 			Staff staff = Caches.load(Staff.class, entity.getId());
 			if (staff == null) {
 				staff = new Staff();
@@ -126,9 +130,15 @@ public class StaffFacadeImpl implements IStaffFacade {
 
 	@Override
 	public void deleteStaff(Long id) {
-		// TODO: 逻辑删除
-		entityDao.delete(StaffEntity.class, id);
-		Caches.remove(Staff.class, id);
+		if (!entityDao.query(
+				"SELECT e.id FROM SalesLogEntity e WHERE e.staff.id = ?1",
+				new Object[] { id }, false, 0, 1).isEmpty()) {
+			entityDao.logicDelete(StaffEntity.class, id);
+			Caches.remove(Staff.class, id);
+		} else {
+			entityDao.delete(StaffEntity.class, id);
+			Caches.remove(Staff.class, id);
+		}
 	}
 
 	public void setEntityDao(IEntityDaoFacade entityDao) {

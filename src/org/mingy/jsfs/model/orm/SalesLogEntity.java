@@ -40,8 +40,8 @@ public class SalesLogEntity implements IEntity {
 	@OneToMany(mappedBy = "salesLog", fetch = FetchType.EAGER)
 	private List<SalesLogDetailEntity> details;
 
-	@Column(name = "DESCRIPTION", length = 200)
-	private String description;
+	@Column(name = "MEMO", length = 200)
+	private String memo;
 
 	public Long getId() {
 		return id;
@@ -75,11 +75,11 @@ public class SalesLogEntity implements IEntity {
 		this.details = details;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getMemo() {
+		return memo;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setMemo(String memo) {
+		this.memo = memo;
 	}
 }

@@ -268,8 +268,8 @@ public abstract class UIUtils {
 		return sb.length() > 0 ? sb.toString() : null;
 	}
 
-	public static <T> String validate(T bean) {
-		Set<ConstraintViolation<T>> violations = Validators.validate(bean);
+	public static <T> String getErrorMessage(
+			Set<ConstraintViolation<T>> violations) {
 		if (!violations.isEmpty()) {
 			StringBuilder sb = new StringBuilder();
 			for (ConstraintViolation<T> violation : violations) {
@@ -280,5 +280,10 @@ public abstract class UIUtils {
 			return sb.toString();
 		}
 		return null;
+	}
+
+	public static String validate(Object bean) {
+		Set<ConstraintViolation<Object>> violations = Validators.validate(bean);
+		return getErrorMessage(violations);
 	}
 }

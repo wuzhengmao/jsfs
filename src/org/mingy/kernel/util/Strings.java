@@ -618,4 +618,44 @@ public abstract class Strings {
 		String secondHalf = original.substring(posIndex);
 		return firstHalf + insertStr + secondHalf;
 	}
+	
+	public static Boolean parseBoolean(String text) {
+		try {
+			return Boolean.parseBoolean(text);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static Integer parseInt(String text) {
+		try {
+			return Integer.parseInt(text);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static Long parseLong(String text) {
+		try {
+			return Long.parseLong(text);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static Float parseFloat(String text) {
+		try {
+			return Float.parseFloat(text);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static Double parseDouble(String text) {
+		try {
+			return Double.parseDouble(text);
+		} catch (Exception e) {
+			return null;
+		}
+	}
 }
