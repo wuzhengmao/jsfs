@@ -3,6 +3,7 @@ package org.mingy.jsfs.ui;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.databinding.DataBindingContext;
@@ -58,6 +59,7 @@ import org.mingy.jsfs.model.Goods;
 import org.mingy.jsfs.model.GoodsType;
 import org.mingy.jsfs.model.SalesLog;
 import org.mingy.jsfs.model.SalesLog.SalesLogDetail;
+import org.mingy.jsfs.model.SalesLogQueryCondition;
 import org.mingy.jsfs.model.Staff;
 import org.mingy.jsfs.ui.model.Catalogs;
 import org.mingy.jsfs.ui.model.MergeDateConverter;
@@ -72,6 +74,7 @@ import org.mingy.kernel.util.Validators;
 public class SalesLogEditDialog extends TitleAreaDialog implements
 		IAggregateValidateListener {
 
+	private SalesLog originSalesLog;
 	private SalesLog salesLog;
 	private DateTime dtSalesDate;
 	private DateTime dtSalesTime;
@@ -90,12 +93,13 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 	 */
 	public SalesLogEditDialog(Shell parentShell, SalesLog salesLog) {
 		super(parentShell);
+		this.originSalesLog = salesLog;
+		this.salesLog = new SalesLog();
 		if (salesLog == null) {
-			this.salesLog = new SalesLog();
 			this.salesLog.setSalesTime(new Date());
 			this.editMode = false;
 		} else {
-			this.salesLog = salesLog;
+			salesLog.copyTo(this.salesLog);
 			this.editMode = true;
 		}
 	}
@@ -516,6 +520,9 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, "保存", true);
+		if (editMode) {
+			createButton(parent, IDialogConstants.IGNORE_ID, "删除", false);
+		}
 		createButton(parent, IDialogConstants.CANCEL_ID,
 				IDialogConstants.CANCEL_LABEL, false);
 	}
@@ -657,11 +664,34 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void okPressed() {
 		try {
 			GlobalBeanContext.getInstance().getBean(ISalesLogFacade.class)
 					.saveSalesLog(salesLog);
+			SalesLogQueryCondition queryCondition = (SalesLogQueryCondition) SalesLogListEditorInput
+					.getInstance().getAdapter(SalesLogQueryCondition.class);
+			List<SalesLog> list = (List<SalesLog>) SalesLogListEditorInput
+					.getInstance().getAdapter(List.class);
+			if (salesLog.getSalesTime().getTime() >= queryCondition
+					.getStartDate().getTime()
+					&& salesLog.getSalesTime().getTime() <= queryCondition
+							.getEndDate().getTime()
+					&& (queryCondition.getStaff() == null || salesLog
+							.getStaff().equals(queryCondition.getStaff()))) {
+				int i = -1;
+				if (originSalesLog != null) {
+					i = list.indexOf(originSalesLog);
+				}
+				if (i < 0) {
+					list.add(salesLog);
+				} else {
+					list.set(i, salesLog);
+				}
+			} else if (originSalesLog != null) {
+				list.remove(originSalesLog);
+			}
 			super.okPressed();
 		} catch (Exception e) {
 			MessageDialog.openError(
@@ -669,6 +699,21 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 					Langs.getText("error.save.title"),
 					Langs.getText("error.save.message", e.getClass().getName()
 							+ ": " + e.getLocalizedMessage()));
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void buttonPressed(int buttonId) {
+		super.buttonPressed(buttonId);
+		if (buttonId == IDialogConstants.IGNORE_ID) {
+			GlobalBeanContext.getInstance().getBean(ISalesLogFacade.class)
+					.deleteSalesLog(salesLog.getId());
+			List<SalesLog> list = (List<SalesLog>) SalesLogListEditorInput
+					.getInstance().getAdapter(List.class);
+			list.remove(originSalesLog);
+			setReturnCode(OK);
+			close();
 		}
 	}
 }

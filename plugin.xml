@@ -31,6 +31,11 @@
             id="org.mingy.jsfs.ui.GoodsEditor"
             name="商品维护">
       </editor>
+      <editor
+            class="org.mingy.jsfs.ui.SalesLogListEditor"
+            id="org.mingy.jsfs.ui.SalesLogListEditor"
+            name="销售记录">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.views">

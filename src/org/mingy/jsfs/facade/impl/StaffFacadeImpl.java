@@ -87,7 +87,7 @@ public class StaffFacadeImpl implements IStaffFacade {
 			staff.setSex(entity.getSex());
 			staff.setBirthday(entity.getBirthday());
 			staff.setContacts(entity.getContacts());
-			staff.setPosition(toPosition(entity.getPosition()));
+			staff.setPosition(EntityConverts.toPosition(entity.getPosition()));
 			staff.setMemo(entity.getMemo());
 			list.add(staff);
 		}
@@ -114,18 +114,6 @@ public class StaffFacadeImpl implements IStaffFacade {
 		entityDao.save(entity);
 		staff.setId(entity.getId());
 		Caches.save(Staff.class, staff);
-	}
-
-	private static Position toPosition(PositionEntity entity) {
-		Position position = Caches.load(Position.class, entity.getId());
-		if (position == null) {
-			position = new Position();
-			position.setId(entity.getId());
-			position.setName(entity.getName());
-			position.setDescription(entity.getDescription());
-			Caches.save(Position.class, position);
-		}
-		return position;
 	}
 
 	@Override

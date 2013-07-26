@@ -19,6 +19,6 @@ public class QuerySalesLogAction extends Action {
 
 	@Override
 	public void run() {
-		new SalesLogQueryConditionInputDialog(window.getShell()).open();
+		new SalesLogQueryConditionInputDialog(window).open();
 	}
 }

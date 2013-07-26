@@ -1,14 +1,18 @@
 package org.mingy.jsfs.ui;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
 import org.eclipse.jface.databinding.viewers.ObservableListContentProvider;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -21,38 +25,41 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.mingy.jsfs.Activator;
+import org.mingy.jsfs.facade.ISalesLogFacade;
+import org.mingy.jsfs.model.SalesLog;
+import org.mingy.jsfs.model.SalesLogQueryCondition;
 import org.mingy.jsfs.model.Staff;
 import org.mingy.jsfs.ui.model.Catalogs;
 import org.mingy.jsfs.ui.model.DateToMaxTimeConverter;
 import org.mingy.jsfs.ui.model.DateToMinTimeConverter;
-import org.mingy.jsfs.ui.model.SalesLogQueryCondition;
 import org.mingy.jsfs.ui.util.IAggregateValidateListener;
 import org.mingy.jsfs.ui.util.UIUtils;
-import org.mingy.kernel.util.Calendars;
+import org.mingy.kernel.context.GlobalBeanContext;
 import org.mingy.kernel.util.Langs;
 
 public class SalesLogQueryConditionInputDialog extends TitleAreaDialog
 		implements IAggregateValidateListener {
 
-	private static SalesLogQueryCondition queryCondition;
+	private static final Log logger = LogFactory
+			.getLog(SalesLogQueryConditionInputDialog.class);
+
+	private IWorkbenchWindow window;
+	private SalesLogQueryCondition queryCondition;
 	private DateTime dtStart;
 	private DateTime dtEnd;
 	private ComboViewer cvStaff;
 	private Map<Control, ControlDecoration> decoratorMap = new LinkedHashMap<Control, ControlDecoration>();
 
-	/**
-	 * Create the dialog.
-	 * 
-	 * @param parentShell
-	 */
-	public SalesLogQueryConditionInputDialog(Shell parentShell) {
-		super(parentShell);
-		if (queryCondition == null) {
-			queryCondition = new SalesLogQueryCondition();
-			queryCondition.setStartDate(Calendars.getMinTimeNow());
-			queryCondition.setEndDate(Calendars.getMaxTimeNow());
-		}
+	public SalesLogQueryConditionInputDialog(IWorkbenchWindow window) {
+		super(window.getShell());
+		this.window = window;
+		this.queryCondition = new SalesLogQueryCondition();
+		((SalesLogQueryCondition) SalesLogListEditorInput.getInstance()
+				.getAdapter(SalesLogQueryCondition.class))
+				.copyTo(this.queryCondition);
 	}
 
 	@Override
@@ -172,5 +179,31 @@ public class SalesLogQueryConditionInputDialog extends TitleAreaDialog
 			setErrorMessage(null);
 			getButton(IDialogConstants.OK_ID).setEnabled(false);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void okPressed() {
+		List<SalesLog> result = GlobalBeanContext.getInstance()
+				.getBean(ISalesLogFacade.class).querySalesLog(queryCondition);
+		queryCondition.copyTo((SalesLogQueryCondition) SalesLogListEditorInput
+				.getInstance().getAdapter(SalesLogQueryCondition.class));
+		List<SalesLog> list = (List<SalesLog>) SalesLogListEditorInput
+				.getInstance().getAdapter(List.class);
+		list.clear();
+		list.addAll(result);
+		try {
+			window.getActivePage().openEditor(
+					SalesLogListEditorInput.getInstance(),
+					SalesLogListEditor.ID);
+		} catch (PartInitException e) {
+			if (logger.isErrorEnabled()) {
+				logger.error("error on open editor", e);
+			}
+			MessageDialog.openError(getShell(), "Error",
+					"Error opening editor:" + e.getLocalizedMessage());
+			return;
+		}
+		super.okPressed();
 	}
 }

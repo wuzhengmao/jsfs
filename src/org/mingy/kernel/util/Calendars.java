@@ -173,6 +173,44 @@ public class Calendars {
 	}
 
 	/**
+	 * 将指定的日历转换为16位长度的日期字串，日期格式为：yyyy-MM-dd HH:mm。
+	 * 
+	 * @param cal
+	 *            日历对象
+	 * @return 日期字串
+	 * @see #get16Date(Date)
+	 */
+	public static String get16Date(Calendar cal) {
+		return get16Date(cal.getTime());
+	}
+
+	/**
+	 * 将指定的日期转换为16位长度的日期字串，日期格式为：yyyy-MM-dd HH:mm。
+	 * 
+	 * @param date
+	 *            日期对象
+	 * @return 日期字串
+	 */
+	public static String get16Date(Date date) {
+		if (date==null)
+		{
+			return "";
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		return sdf.format(date);
+	}
+
+	/**
+	 * 获得一个16位长度的当前日期字串
+	 * 
+	 * @return 日期字串
+	 * @see #get16Date(Date)
+	 */
+	public static String get16DateNow() {
+		return get16Date(new Date());
+	}
+
+	/**
 	 * 将指定的日历转换为19位长度的日期字串，日期格式为：yyyy-MM-dd HH:mm:ss。
 	 * 
 	 * @param cal

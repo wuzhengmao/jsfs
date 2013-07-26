@@ -83,7 +83,7 @@ public class GoodsFacadeImpl implements IGoodsFacade {
 				goods.setId(entity.getId());
 				Caches.save(Goods.class, goods);
 			}
-			goods.setType(toGoodsType(entity.getType()));
+			goods.setType(EntityConverts.toGoodsType(entity.getType()));
 			goods.setName(entity.getName());
 			goods.setSalesPrice(entity.getSalesPrice());
 			goods.setMemo(entity.getMemo());
@@ -110,18 +110,6 @@ public class GoodsFacadeImpl implements IGoodsFacade {
 		entityDao.save(entity);
 		goods.setId(entity.getId());
 		Caches.save(Goods.class, goods);
-	}
-
-	private static GoodsType toGoodsType(GoodsTypeEntity entity) {
-		GoodsType goodsType = Caches.load(GoodsType.class, entity.getId());
-		if (goodsType == null) {
-			goodsType = new GoodsType();
-			goodsType.setId(entity.getId());
-			goodsType.setName(entity.getName());
-			goodsType.setDescription(entity.getDescription());
-			Caches.save(GoodsType.class, goodsType);
-		}
-		return goodsType;
 	}
 
 	@Override

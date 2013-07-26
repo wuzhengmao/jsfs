@@ -1,12 +1,10 @@
-package org.mingy.jsfs.ui.model;
+package org.mingy.jsfs.model;
 
 import java.util.Date;
 
 import javax.validation.constraints.NotNull;
 
-import org.mingy.jsfs.model.Staff;
-
-public class SalesLogQueryCondition {
+public class SalesLogQueryCondition extends PropertyChangeSupportBean {
 
 	@NotNull(message = "{startDate.NotNull}")
 	private Date startDate;
@@ -15,12 +13,19 @@ public class SalesLogQueryCondition {
 
 	private Staff staff;
 
+	public void copyTo(SalesLogQueryCondition target) {
+		target.setStartDate(startDate);
+		target.setEndDate(endDate);
+		target.setStaff(staff);
+	}
+
 	public Date getStartDate() {
 		return startDate;
 	}
 
 	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
+		firePropertyChange("startDate", this.startDate,
+				this.startDate = startDate);
 	}
 
 	public Date getEndDate() {
@@ -28,7 +33,7 @@ public class SalesLogQueryCondition {
 	}
 
 	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+		firePropertyChange("endDate", this.endDate, this.endDate = endDate);
 	}
 
 	public Staff getStaff() {
@@ -36,6 +41,6 @@ public class SalesLogQueryCondition {
 	}
 
 	public void setStaff(Staff staff) {
-		this.staff = staff;
+		firePropertyChange("staff", this.staff, this.staff = staff);
 	}
 }

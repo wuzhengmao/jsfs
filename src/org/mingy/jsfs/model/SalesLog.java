@@ -27,6 +27,16 @@ public class SalesLog {
 	@Length(max = 100, message = "{memo.MaxLength}")
 	private String memo;
 
+	@SuppressWarnings("unchecked")
+	public void copyTo(SalesLog target) {
+		target.setId(id);
+		target.setSalesTime(salesTime);
+		target.setStaff(staff);
+		target.getDetails().clear();
+		target.getDetails().addAll(details);
+		target.setMemo(memo);
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -55,7 +65,7 @@ public class SalesLog {
 	public List<SalesLogDetail> getDetails() {
 		return details;
 	}
-	
+
 	public IObservableList getObservableDetails() {
 		return details;
 	}
