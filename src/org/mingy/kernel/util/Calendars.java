@@ -48,8 +48,7 @@ public class Calendars {
 	 * @return 输出的时间字符串
 	 */
 	public static String dateFormat(Date date, String pattern) {
-		if (date==null)
-		{
+		if (date == null) {
 			return "";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat(pattern);
@@ -86,8 +85,7 @@ public class Calendars {
 	 */
 	public static String dateTransform(String srcDate, String srcPattern,
 			String tarPattern) throws ParseException {
-		if (srcDate==null)
-		{
+		if (srcDate == null) {
 			return "";
 		}
 		SimpleDateFormat srcSdf = new SimpleDateFormat(srcPattern);
@@ -116,8 +114,7 @@ public class Calendars {
 	 * @return 日期字串
 	 */
 	public static String get10Date(Date date) {
-		if (date==null)
-		{
+		if (date == null) {
 			return "";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -154,8 +151,7 @@ public class Calendars {
 	 * @return 时间字串
 	 */
 	public static String get12Time(Date date) {
-		if (date==null)
-		{
+		if (date == null) {
 			return "";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
@@ -192,8 +188,7 @@ public class Calendars {
 	 * @return 日期字串
 	 */
 	public static String get16Date(Date date) {
-		if (date==null)
-		{
+		if (date == null) {
 			return "";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -230,8 +225,7 @@ public class Calendars {
 	 * @return 日期字串
 	 */
 	public static String get19Date(Date date) {
-		if (date==null)
-		{
+		if (date == null) {
 			return "";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -268,8 +262,7 @@ public class Calendars {
 	 * @return 日期字串
 	 */
 	public static String get23Date(Date date) {
-		if (date==null)
-		{
+		if (date == null) {
 			return "";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -306,8 +299,7 @@ public class Calendars {
 	 * @return 时间字串
 	 */
 	public static String get5Time(Date date) {
-		if (date==null)
-		{
+		if (date == null) {
 			return "";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
@@ -344,8 +336,7 @@ public class Calendars {
 	 * @return 时间字串
 	 */
 	public static String get8Time(Date date) {
-		if (date==null)
-		{
+		if (date == null) {
 			return "";
 		}
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
@@ -436,6 +427,30 @@ public class Calendars {
 			calendar.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
 			calendar.set(Calendar.SECOND, cal.get(Calendar.SECOND));
 		}
+		return calendar.getTime();
+	}
+
+	public static Date getMinTimeOfMonth(Date date) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.set(Calendar.DAY_OF_MONTH, 1);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar.getTime();
+	}
+
+	public static Date getMaxTimeOfMonth(Date date) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.set(Calendar.DAY_OF_MONTH, 1);
+		calendar.add(Calendar.MONTH, 1);
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		calendar.set(Calendar.HOUR_OF_DAY, 23);
+		calendar.set(Calendar.MINUTE, 59);
+		calendar.set(Calendar.SECOND, 59);
+		calendar.set(Calendar.MILLISECOND, 999);
 		return calendar.getTime();
 	}
 }

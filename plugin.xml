@@ -36,6 +36,11 @@
             id="org.mingy.jsfs.ui.SalesLogListEditor"
             name="销售记录">
       </editor>
+      <editor
+            class="org.mingy.jsfs.ui.SalesLogStatEditor"
+            id="org.mingy.jsfs.ui.SalesLogStatEditor"
+            name="销售汇总">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -61,6 +66,11 @@
             name="查询销售记录..."
             description="根据输入条件查询销售记录"
             id="org.mingy.jsfs.ui.querySalesLog">
+      </command>
+      <command
+            name="统计销售记录..."
+            description="根据输入条件统计销售记录"
+            id="org.mingy.jsfs.ui.statSalesLog">
       </command>
       <command
             name="控制台"

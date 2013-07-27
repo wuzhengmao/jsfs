@@ -8,11 +8,13 @@ import org.mingy.jsfs.facade.ISalesLogFacade;
 import org.mingy.jsfs.model.SalesLog;
 import org.mingy.jsfs.model.SalesLog.SalesLogDetail;
 import org.mingy.jsfs.model.SalesLogQueryCondition;
+import org.mingy.jsfs.model.SalesLogStat;
 import org.mingy.jsfs.model.orm.GoodsEntity;
 import org.mingy.jsfs.model.orm.SalesLogDetailEntity;
 import org.mingy.jsfs.model.orm.SalesLogEntity;
 import org.mingy.jsfs.model.orm.StaffEntity;
 import org.mingy.kernel.facade.IEntityDaoFacade;
+import org.mingy.kernel.util.Calendars;
 
 public class SalesLogFacadeImpl implements ISalesLogFacade {
 
@@ -52,6 +54,25 @@ public class SalesLogFacadeImpl implements ISalesLogFacade {
 			result.add(salesLog);
 		}
 		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public SalesLogStat statSalesLog(SalesLogQueryCondition queryCondition) {
+		List<SalesLogEntity> list = entityDao
+				.query("SELECT e FROM SalesLogEntity e WHERE e.salesTime BETWEEN ?1 AND ?2 ORDER BY e.staff.position.id, e.staff.id",
+						new Object[] { queryCondition.getStartDate(),
+								queryCondition.getEndDate() }, false);
+		SalesLogStat stat = new SalesLogStat();
+		for (SalesLogEntity entity : list) {
+			double price = 0;
+			for (SalesLogDetailEntity detailEntity : entity.getDetails()) {
+				price += detailEntity.getTotalPrice();
+			}
+			stat.add(Calendars.getMinTime(entity.getSalesTime()),
+					EntityConverts.toStaff(entity.getStaff()), price);
+		}
+		return stat;
 	}
 
 	@Override
