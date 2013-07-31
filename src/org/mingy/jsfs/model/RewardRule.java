@@ -1,15 +1,17 @@
 package org.mingy.jsfs.model;
 
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 
-public class RewardRule extends PropertyChangeSupportBean implements IIdentity,
-		INamedObject {
+public class RewardRule extends PropertyChangeSupportBean implements
+		ICachable<RewardRule>, INamedObject {
 
 	private Long id;
 
@@ -18,17 +20,28 @@ public class RewardRule extends PropertyChangeSupportBean implements IIdentity,
 	private String name;
 
 	@NotEmpty(message = "{positions.NotEmpty}")
-	private List<Position> positions = new ArrayList<Position>();
+	private Set<Position> positions;
 
 	private GoodsType goodsType;
 
 	private Goods goods;
 
-	@NotEmpty(message = "{rule.details.NotEmpty}")
-	private List<RewardRuleDetail> details = new ArrayList<RewardRuleDetail>();
+	@NotBlank(message = "{script.NotNull}")
+	@Length(max = 2000, message = "{script.MaxLength}")
+	private String script;
 
 	@Length(max = 100, message = "{desc.MaxLength}")
 	private String description;
+
+	public void copyTo(RewardRule target) {
+		target.setId(id);
+		target.setName(name);
+		target.setPositions(new HashSet<Position>(positions));
+		target.setGoodsType(goodsType);
+		target.setGoods(goods);
+		target.setScript(script);
+		target.setDescription(description);
+	}
 
 	@Override
 	public void addNameChangeListener(PropertyChangeListener listener) {
@@ -56,6 +69,30 @@ public class RewardRule extends PropertyChangeSupportBean implements IIdentity,
 		firePropertyChange("name", this.name, this.name = name);
 	}
 
+	public Set<Position> getPositions() {
+		return positions;
+	}
+
+	public void setPositions(Set<Position> positions) {
+		firePropertyChange("positions", this.positions,
+				this.positions = positions);
+	}
+
+	@NotNull(message = "{goodsOrType.NotNull}")
+	public Object getGoodsOrType() {
+		return goods != null ? goods : goodsType;
+	}
+
+	public void setGoodsOrType(Object goodsOrType) {
+		if (goodsOrType instanceof Goods) {
+			goodsType = null;
+			goods = (Goods) goodsOrType;
+		} else {
+			goodsType = (GoodsType) goodsOrType;
+			goods = null;
+		}
+	}
+
 	public GoodsType getGoodsType() {
 		return goodsType;
 	}
@@ -72,82 +109,19 @@ public class RewardRule extends PropertyChangeSupportBean implements IIdentity,
 		this.goods = goods;
 	}
 
+	public String getScript() {
+		return script;
+	}
+
+	public void setScript(String script) {
+		this.script = script;
+	}
+
 	public String getDescription() {
 		return description;
 	}
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public List<Position> getPositions() {
-		return positions;
-	}
-
-	public List<RewardRuleDetail> getDetails() {
-		return details;
-	}
-
-	public class RewardRuleDetail {
-
-		private Long id;
-
-		private Integer minCount;
-
-		private Integer maxCount;
-
-		private Integer countType;
-
-		private Double bonusValue;
-
-		private Double bonusPercent;
-
-		public Long getId() {
-			return id;
-		}
-
-		public void setId(Long id) {
-			this.id = id;
-		}
-
-		public Integer getMinCount() {
-			return minCount;
-		}
-
-		public void setMinCount(Integer minCount) {
-			this.minCount = minCount;
-		}
-
-		public Integer getMaxCount() {
-			return maxCount;
-		}
-
-		public void setMaxCount(Integer maxCount) {
-			this.maxCount = maxCount;
-		}
-
-		public Integer getCountType() {
-			return countType;
-		}
-
-		public void setCountType(Integer countType) {
-			this.countType = countType;
-		}
-
-		public Double getBonusValue() {
-			return bonusValue;
-		}
-
-		public void setBonusValue(Double bonusValue) {
-			this.bonusValue = bonusValue;
-		}
-
-		public Double getBonusPercent() {
-			return bonusPercent;
-		}
-
-		public void setBonusPercent(Double bonusPercent) {
-			this.bonusPercent = bonusPercent;
-		}
 	}
 }

@@ -32,6 +32,11 @@
             name="商品维护">
       </editor>
       <editor
+            class="org.mingy.jsfs.ui.RewardRuleEditor"
+            id="org.mingy.jsfs.ui.RewardRuleEditor"
+            name="规则维护">
+      </editor>
+      <editor
             class="org.mingy.jsfs.ui.SalesLogListEditor"
             id="org.mingy.jsfs.ui.SalesLogListEditor"
             name="销售记录">
@@ -109,6 +114,13 @@
                id="org.mingy.jsfs.ui.NewGoodsWizard"
                name="商品"
                class="org.mingy.jsfs.ui.NewGoodsWizard"
+               canFinishEarly="true"
+               hasPages="false">
+         </wizard>
+         <wizard
+               id="org.mingy.jsfs.ui.NewRewardRuleWizard"
+               name="提成规则"
+               class="org.mingy.jsfs.ui.NewRewardRuleWizard"
                canFinishEarly="true"
                hasPages="false">
          </wizard>

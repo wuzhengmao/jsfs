@@ -1,6 +1,6 @@
 package org.mingy.jsfs.model.orm;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.mingy.kernel.bean.IEntity;
@@ -33,7 +32,7 @@ public class RewardRuleEntity implements IEntity {
 
 	@ManyToMany(targetEntity = PositionEntity.class, cascade = {}, fetch = FetchType.LAZY)
 	@JoinTable(name = "T_REWARD_RULE_POSITION", joinColumns = { @JoinColumn(name = "RULE_ID", referencedColumnName = "ID", nullable = false) }, inverseJoinColumns = { @JoinColumn(name = "POSITION_ID", referencedColumnName = "ID", nullable = false) })
-	private List<PositionEntity> positions;
+	private Set<PositionEntity> positions;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "GOODS_TYPE")
@@ -43,8 +42,8 @@ public class RewardRuleEntity implements IEntity {
 	@JoinColumn(name = "GOODS_ID")
 	private GoodsEntity goods;
 
-	@OneToMany(mappedBy = "rule", fetch = FetchType.EAGER)
-	private List<RewardRuleDetailEntity> details;
+	@Column(name = "SCRIPT", nullable = false, length = 2000)
+	private String script;
 
 	@Column(name = "DESCRIPTION", length = 200)
 	private String description;
@@ -65,11 +64,11 @@ public class RewardRuleEntity implements IEntity {
 		this.name = name;
 	}
 
-	public List<PositionEntity> getPositions() {
+	public Set<PositionEntity> getPositions() {
 		return positions;
 	}
 
-	public void setPositions(List<PositionEntity> positions) {
+	public void setPositions(Set<PositionEntity> positions) {
 		this.positions = positions;
 	}
 
@@ -89,12 +88,12 @@ public class RewardRuleEntity implements IEntity {
 		this.goods = goods;
 	}
 
-	public List<RewardRuleDetailEntity> getDetails() {
-		return details;
+	public String getScript() {
+		return script;
 	}
 
-	public void setDetails(List<RewardRuleDetailEntity> details) {
-		this.details = details;
+	public void setScript(String script) {
+		this.script = script;
 	}
 
 	public String getDescription() {

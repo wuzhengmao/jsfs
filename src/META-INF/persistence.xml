@@ -10,7 +10,6 @@
 		<class>org.mingy.jsfs.model.orm.GoodsTypeEntity</class>
 		<class>org.mingy.jsfs.model.orm.GoodsEntity</class>
 		<class>org.mingy.jsfs.model.orm.RewardRuleEntity</class>
-		<class>org.mingy.jsfs.model.orm.RewardRuleDetailEntity</class>
 		<class>org.mingy.jsfs.model.orm.SalesLogEntity</class>
 		<class>org.mingy.jsfs.model.orm.SalesLogDetailEntity</class>
 	</persistence-unit>

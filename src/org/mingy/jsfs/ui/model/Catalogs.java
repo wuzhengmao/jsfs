@@ -6,10 +6,12 @@ import java.util.Map;
 
 import org.eclipse.core.databinding.observable.list.WritableList;
 import org.mingy.jsfs.facade.IGoodsFacade;
+import org.mingy.jsfs.facade.IRewardRuleFacade;
 import org.mingy.jsfs.facade.IStaffFacade;
 import org.mingy.jsfs.model.Goods;
 import org.mingy.jsfs.model.GoodsType;
 import org.mingy.jsfs.model.Position;
+import org.mingy.jsfs.model.RewardRule;
 import org.mingy.jsfs.model.Staff;
 import org.mingy.kernel.context.GlobalBeanContext;
 
@@ -19,6 +21,8 @@ public abstract class Catalogs {
 			.getInstance().getBean(IStaffFacade.class);
 	private static final IGoodsFacade goodsFacade = GlobalBeanContext
 			.getInstance().getBean(IGoodsFacade.class);
+	private static final IRewardRuleFacade rewardRuleFacade = GlobalBeanContext
+			.getInstance().getBean(IRewardRuleFacade.class);
 
 	private static Catalog root;
 	private static Map<Object, Catalog> catalogs;
@@ -54,6 +58,7 @@ public abstract class Catalogs {
 		goodsList.clear();
 		loadStaffs(staffCatalog);
 		loadGoods(goodsCatalog);
+		loadRules(ruleCatalog);
 		inited = true;
 	}
 
@@ -98,6 +103,15 @@ public abstract class Catalogs {
 					break;
 				}
 			}
+		}
+	}
+
+	private static void loadRules(Catalog parent) {
+		for (RewardRule rule : rewardRuleFacade.getRules()) {
+			Catalog catalog = new Catalog(rule);
+			catalog.setParent(parent);
+			parent.getChildren().add(catalog);
+			catalogs.put(rule, catalog);
 		}
 	}
 
@@ -184,6 +198,16 @@ public abstract class Catalogs {
 		}
 	}
 
+	public static void updateCatalog(Catalog catalog, RewardRule rule) {
+		if (catalog.getValue() == null) {
+			catalog.setValue(rule);
+			getCatalog(Catalog.TYPE_RULE).getChildren().add(catalog);
+			catalogs.put(rule, catalog);
+		} else if (rule != catalog.getValue()) {
+			rule.copyTo((RewardRule) catalog.getValue());
+		}
+	}
+
 	public static void removeCatalog(Catalog catalog, Position position) {
 		catalog.getParent().getChildren().remove(catalog);
 		catalogs.remove(position);
@@ -206,6 +230,11 @@ public abstract class Catalogs {
 		catalog.getParent().getChildren().remove(catalog);
 		catalogs.remove(goods);
 		goodsList.remove(goods);
+	}
+
+	public static void removeCatalog(Catalog catalog, RewardRule rule) {
+		catalog.getParent().getChildren().remove(catalog);
+		catalogs.remove(rule);
 	}
 
 	public static Catalog getCatalog(int type) {

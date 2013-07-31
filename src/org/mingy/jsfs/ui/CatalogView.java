@@ -33,10 +33,12 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 import org.mingy.jsfs.Activator;
 import org.mingy.jsfs.facade.IGoodsFacade;
+import org.mingy.jsfs.facade.IRewardRuleFacade;
 import org.mingy.jsfs.facade.IStaffFacade;
 import org.mingy.jsfs.model.Goods;
 import org.mingy.jsfs.model.GoodsType;
 import org.mingy.jsfs.model.Position;
+import org.mingy.jsfs.model.RewardRule;
 import org.mingy.jsfs.model.Staff;
 import org.mingy.jsfs.ui.model.Catalog;
 import org.mingy.jsfs.ui.model.Catalogs;
@@ -195,9 +197,25 @@ public class CatalogView extends ViewPart {
 					new GoodsTypeEditDialog(getSite().getShell(), catalog)
 							.open();
 					break;
+				case Catalog.TYPE_RULE:
+					try {
+						getSite().getPage().openEditor(
+								new CatalogEditorInput(catalog),
+								RewardRuleEditor.ID);
+					} catch (PartInitException e) {
+						if (logger.isErrorEnabled()) {
+							logger.error("error on open editor", e);
+						}
+						MessageDialog.openError(
+								getSite().getShell(),
+								"Error",
+								"Error opening editor:"
+										+ e.getLocalizedMessage());
+					}
+					break;
 				case Catalog.TYPE_CATALOG:
 					try {
-						switch (catalog.getParent().getType()) {
+						switch (catalog.getRoot().getType()) {
 						case Catalog.TYPE_STAFF:
 							getSite().getPage().openEditor(
 									new CatalogEditorInput(catalog),
@@ -236,7 +254,7 @@ public class CatalogView extends ViewPart {
 				Catalog catalog = getSelectedItem();
 				switch (catalog.getType()) {
 				case Catalog.TYPE_CATALOG:
-					switch (catalog.getParent().getType()) {
+					switch (catalog.getRoot().getType()) {
 					case Catalog.TYPE_STAFF:
 						new PositionEditDialog(getSite().getShell(), catalog)
 								.open();
@@ -249,7 +267,7 @@ public class CatalogView extends ViewPart {
 					break;
 				case Catalog.TYPE_ITEM:
 					try {
-						switch (catalog.getParent().getParent().getType()) {
+						switch (catalog.getRoot().getType()) {
 						case Catalog.TYPE_STAFF:
 							getSite().getPage().openEditor(
 									new CatalogEditorInput(catalog),
@@ -259,6 +277,11 @@ public class CatalogView extends ViewPart {
 							getSite().getPage().openEditor(
 									new CatalogEditorInput(catalog),
 									GoodsEditor.ID);
+							break;
+						case Catalog.TYPE_RULE:
+							getSite().getPage().openEditor(
+									new CatalogEditorInput(catalog),
+									RewardRuleEditor.ID);
 							break;
 						}
 					} catch (PartInitException e) {
@@ -288,7 +311,7 @@ public class CatalogView extends ViewPart {
 				Catalog catalog = getSelectedItem();
 				switch (catalog.getType()) {
 				case Catalog.TYPE_CATALOG:
-					switch (catalog.getParent().getType()) {
+					switch (catalog.getRoot().getType()) {
 					case Catalog.TYPE_STAFF:
 						deletePosition(catalog);
 						break;
@@ -298,12 +321,15 @@ public class CatalogView extends ViewPart {
 					}
 					break;
 				case Catalog.TYPE_ITEM:
-					switch (catalog.getParent().getParent().getType()) {
+					switch (catalog.getRoot().getType()) {
 					case Catalog.TYPE_STAFF:
 						deleteStaff(catalog);
 						break;
 					case Catalog.TYPE_GOODS:
 						deleteGoods(catalog);
+						break;
+					case Catalog.TYPE_RULE:
+						deleteRewardRule(catalog);
 						break;
 					}
 					break;
@@ -387,6 +413,31 @@ public class CatalogView extends ViewPart {
 				GlobalBeanContext.getInstance().getBean(IGoodsFacade.class)
 						.deleteGoods(goods.getId());
 				Catalogs.removeCatalog(catalog, goods);
+				IEditorPart editor = getSite().getPage().findEditor(
+						new CatalogEditorInput(catalog));
+				if (editor != null) {
+					getSite().getPage().closeEditor(editor, false);
+				}
+				return true;
+			} catch (Exception e) {
+				handleExceptionOnDelete(e);
+			}
+		}
+		return false;
+	}
+
+	private boolean deleteRewardRule(Catalog catalog) {
+		RewardRule rule = (RewardRule) catalog.getValue();
+		if (MessageDialog.openConfirm(
+				getSite().getShell(),
+				Langs.getText("confirm.delete.title"),
+				Langs.getText("confirm.delete_rewardRule.message",
+						rule.getName()))) {
+			try {
+				GlobalBeanContext.getInstance()
+						.getBean(IRewardRuleFacade.class)
+						.deleteRule(rule.getId());
+				Catalogs.removeCatalog(catalog, rule);
 				IEditorPart editor = getSite().getPage().findEditor(
 						new CatalogEditorInput(catalog));
 				if (editor != null) {

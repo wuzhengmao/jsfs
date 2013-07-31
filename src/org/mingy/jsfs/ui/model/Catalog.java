@@ -99,6 +99,22 @@ public class Catalog extends PropertyChangeSupportBean implements
 		return type == TYPE_CATALOG;
 	}
 
+	public Catalog getRoot() {
+		Catalog p = this;
+		while (p != null && !p.isRoot()) {
+			p = p.getParent();
+		}
+		return p;
+	}
+
+	public Catalog getSub() {
+		Catalog p = this;
+		while (p != null && !p.isSub()) {
+			p = p.getParent();
+		}
+		return p;
+	}
+
 	public Catalog getParent() {
 		return parent;
 	}

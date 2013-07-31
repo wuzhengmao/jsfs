@@ -15,5 +15,6 @@ public class Perspective implements IPerspectiveFactory {
 				IPageLayout.BOTTOM, 0.7f, editorArea);
 		layout.addNewWizardShortcut(NewStaffWizard.ID);
 		layout.addNewWizardShortcut(NewGoodsWizard.ID);
+		layout.addNewWizardShortcut(NewRewardRuleWizard.ID);
 	}
 }

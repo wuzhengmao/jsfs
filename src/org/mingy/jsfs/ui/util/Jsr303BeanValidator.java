@@ -1,9 +1,5 @@
 package org.mingy.jsfs.ui.util;
 
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-
 import org.eclipse.core.databinding.validation.IValidator;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
@@ -31,16 +27,9 @@ public class Jsr303BeanValidator implements IValidator {
 	@SuppressWarnings("unchecked")
 	@Override
 	public IStatus validate(Object value) {
-		Set<ConstraintViolation<?>> violations = Validators.validateValue(
-				clazz, propName, value);
-		if (!violations.isEmpty()) {
-			StringBuilder sb = new StringBuilder();
-			for (ConstraintViolation<?> violation : violations) {
-				if (sb.length() > 0)
-					sb.append("\n");
-				sb.append(violation.getMessage());
-			}
-			String errorText = sb.toString();
+		String errorText = UIUtils.getErrorMessage(Validators.validateValue(
+				clazz, propName, value));
+		if (errorText != null) {
 			if (controlDecoration != null) {
 				controlDecoration.setDescriptionText(errorText);
 				controlDecoration.show();

@@ -1,5 +1,7 @@
 package org.mingy.jsfs.ui;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,7 +37,8 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 	private boolean ignoreChange = false;
 
 	private class DefaultModifyListener implements ModifyListener,
-			ISelectionChangedListener, SelectionListener {
+			ISelectionChangedListener, SelectionListener,
+			PropertyChangeListener {
 
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -61,6 +64,13 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 		@Override
 		public void widgetDefaultSelected(SelectionEvent e) {
 			// do nothing
+		}
+
+		@Override
+		public void propertyChange(PropertyChangeEvent evt) {
+			if (!ignoreChange) {
+				setDirty(true);
+			}
 		}
 	}
 
@@ -88,6 +98,10 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 	protected abstract void save(T bean);
 
 	protected abstract void postSave(T bean);
+
+	protected ControlDecoration createControlDecoration(Control control) {
+		return UIUtils.createControlDecoration(control, decoratorMap);
+	}
 
 	protected void bindText(Control control, Object bean, String propName) {
 		UIUtils.bindText(dataBindingContext, control, bean, propName,
