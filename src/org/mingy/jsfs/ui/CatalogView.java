@@ -10,8 +10,11 @@ import org.eclipse.core.databinding.observable.IObservable;
 import org.eclipse.core.databinding.observable.list.DecoratingObservableList;
 import org.eclipse.core.databinding.observable.masterdetail.IObservableFactory;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.databinding.viewers.ObservableListTreeContentProvider;
 import org.eclipse.jface.databinding.viewers.ObservableMapLabelProvider;
@@ -42,6 +45,7 @@ import org.mingy.jsfs.model.RewardRule;
 import org.mingy.jsfs.model.Staff;
 import org.mingy.jsfs.ui.model.Catalog;
 import org.mingy.jsfs.ui.model.Catalogs;
+import org.mingy.jsfs.ui.util.ActionWrapper;
 import org.mingy.kernel.context.GlobalBeanContext;
 import org.mingy.kernel.util.ApplicationException;
 import org.mingy.kernel.util.Langs;
@@ -480,8 +484,89 @@ public class CatalogView extends ViewPart {
 	 * Initialize the menu.
 	 */
 	private void initializeMenu() {
-		IMenuManager menuManager = getViewSite().getActionBars()
-				.getMenuManager();
+		final IAction addPositionAction = new ActionWrapper(addAction, "新增职位",
+				null, null);
+		final IAction addStaffAction = new ActionWrapper(addAction, "新增员工",
+				null, null);
+		final IAction addGoodsTypeAction = new ActionWrapper(addAction,
+				"新增商品分类", null, null);
+		final IAction addGoodsAction = new ActionWrapper(addAction, "新增商品",
+				null, null);
+		final IAction addRuleAction = new ActionWrapper(addAction, "新增提成规则",
+				null, null);
+		final IAction editPositionAction = new ActionWrapper(editAction,
+				"修改职位", null, null);
+		final IAction editStaffAction = new ActionWrapper(editAction, "修改员工",
+				null, null);
+		final IAction editGoodsTypeAction = new ActionWrapper(editAction,
+				"修改商品分类", null, null);
+		final IAction editGoodsAction = new ActionWrapper(editAction, "修改商品",
+				null, null);
+		final IAction editRuleAction = new ActionWrapper(editAction, "修改提成规则",
+				null, null);
+		final IAction delPositionAction = new ActionWrapper(deleteAction,
+				"删除职位", null, null);
+		final IAction delStaffAction = new ActionWrapper(deleteAction, "删除员工",
+				null, null);
+		final IAction delGoodsTypeAction = new ActionWrapper(deleteAction,
+				"删除商品分类", null, null);
+		final IAction delGoodsAction = new ActionWrapper(deleteAction, "删除商品",
+				null, null);
+		final IAction delRuleAction = new ActionWrapper(deleteAction, "删除提成规则",
+				null, null);
+		final Separator separator = new Separator();
+		MenuManager menuManager = new MenuManager();
+		menuManager.setRemoveAllWhenShown(true);
+		menuManager.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				Catalog catalog = getSelectedItem();
+				switch (catalog.getType()) {
+				case Catalog.TYPE_STAFF:
+					manager.add(addPositionAction);
+					break;
+				case Catalog.TYPE_GOODS:
+					manager.add(addGoodsTypeAction);
+					break;
+				case Catalog.TYPE_RULE:
+					manager.add(addRuleAction);
+					break;
+				case Catalog.TYPE_CATALOG:
+					switch (catalog.getRoot().getType()) {
+					case Catalog.TYPE_STAFF:
+						manager.add(addStaffAction);
+						manager.add(separator);
+						manager.add(editPositionAction);
+						manager.add(delPositionAction);
+						break;
+					case Catalog.TYPE_GOODS:
+						manager.add(addGoodsAction);
+						manager.add(separator);
+						manager.add(editGoodsTypeAction);
+						manager.add(delGoodsTypeAction);
+						break;
+					}
+					break;
+				case Catalog.TYPE_ITEM:
+					switch (catalog.getRoot().getType()) {
+					case Catalog.TYPE_STAFF:
+						manager.add(editStaffAction);
+						manager.add(delStaffAction);
+						break;
+					case Catalog.TYPE_GOODS:
+						manager.add(editGoodsAction);
+						manager.add(delGoodsAction);
+						break;
+					case Catalog.TYPE_RULE:
+						manager.add(editRuleAction);
+						manager.add(delRuleAction);
+						break;
+					}
+					break;
+				}
+			}
+		});
+		treeViewer.getTree().setMenu(
+				menuManager.createContextMenu(treeViewer.getTree()));
 	}
 
 	@Override
