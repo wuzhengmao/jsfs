@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
@@ -48,6 +49,7 @@ public class SalesLogStatEditor extends EditorPart {
 		for (TableColumn col : table.getColumns()) {
 			col.dispose();
 		}
+		Color blue = new Color(getSite().getShell().getDisplay(), 0, 0, 255);
 		TableColumn staffCol = new TableColumn(table, SWT.NONE);
 		staffCol.setWidth(80);
 		staffCol.setText("员工");
@@ -68,20 +70,20 @@ public class SalesLogStatEditor extends EditorPart {
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(0, staff.getName());
 			for (int i = 0; i < days.length; i++) {
-				item.setText(i + 1, Strings.objToString(salesLogStat.getStat(
-						days[i], staff)));
+				item.setText(i + 1,
+						Strings.format(salesLogStat.getStat(days[i], staff), 1));
 			}
 			item.setText(days.length + 1,
-					Strings.objToString(salesLogStat.getStat(staff)));
+					Strings.format(salesLogStat.getStat(staff), 1));
 		}
 		TableItem item = new TableItem(table, SWT.NONE);
+		item.setForeground(blue);
 		item.setText(0, "合计");
 		for (int i = 0; i < days.length; i++) {
 			item.setText(i + 1,
-					Strings.objToString(salesLogStat.getStat(days[i])));
+					Strings.format(salesLogStat.getStat(days[i]), 1));
 		}
-		item.setText(days.length + 1,
-				Strings.objToString(salesLogStat.getStat()));
+		item.setText(days.length + 1, Strings.format(salesLogStat.getStat(), 1));
 	}
 
 	@Override

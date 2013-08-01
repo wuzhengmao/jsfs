@@ -13,6 +13,7 @@ public interface ICommandIds {
 	public static final String CMD_INPUT_SALES_LOG = "org.mingy.jsfs.ui.inputSalesLog";
 	public static final String CMD_QUERY_SALES_LOG = "org.mingy.jsfs.ui.querySalesLog";
 	public static final String CMD_STAT_SALES_LOG = "org.mingy.jsfs.ui.statSalesLog";
+	public static final String CMD_CALC_SALARY = "org.mingy.jsfs.ui.calcSalary";
 	public static final String CMD_OPEN_CONSOLE = "org.mingy.jsfs.ui.openConsole";
 
 }

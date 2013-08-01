@@ -79,11 +79,11 @@ public class RewardRule extends PropertyChangeSupportBean implements
 	}
 
 	@NotNull(message = "{goodsOrType.NotNull}")
-	public Object getGoodsOrType() {
+	public INamedObject getGoodsOrType() {
 		return goods != null ? goods : goodsType;
 	}
 
-	public void setGoodsOrType(Object goodsOrType) {
+	public void setGoodsOrType(INamedObject goodsOrType) {
 		if (goodsOrType instanceof Goods) {
 			goodsType = null;
 			goods = (Goods) goodsOrType;

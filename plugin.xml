@@ -46,6 +46,11 @@
             id="org.mingy.jsfs.ui.SalesLogStatEditor"
             name="销售汇总">
       </editor>
+      <editor
+            class="org.mingy.jsfs.ui.SalaryListEditor"
+            id="org.mingy.jsfs.ui.SalaryListEditor"
+            name="工资清单">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -76,6 +81,11 @@
             name="统计销售记录..."
             description="根据输入条件统计销售记录"
             id="org.mingy.jsfs.ui.statSalesLog">
+      </command>
+      <command
+            name="计算工资..."
+            description="根据销售记录和规则计算月工资"
+            id="org.mingy.jsfs.ui.calcSalary">
       </command>
       <command
             name="控制台"

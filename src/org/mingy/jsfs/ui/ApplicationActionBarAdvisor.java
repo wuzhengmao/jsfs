@@ -28,6 +28,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IAction inputSalesLogAction;
 	private IAction querySalesLogAction;
 	private IAction statSalesLogAction;
+	private IAction calcSalaryAction;
 	private IAction openConsoleAction;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
@@ -87,6 +88,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			register(statSalesLogAction);
 		}
 		{
+			calcSalaryAction = new CalcSalaryAction(window, "计算工资(&C)...");
+			calcSalaryAction.setToolTipText("计算工资");
+			register(calcSalaryAction);
+		}
+		{
 			openConsoleAction = new OpenConsoleAction(window, "控制台(&L)");
 			openConsoleAction.setToolTipText("打开控制台输出日志");
 			register(openConsoleAction);
@@ -119,6 +125,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		windowMenu.add(querySalesLogAction);
 		windowMenu.add(statSalesLogAction);
 		windowMenu.add(new Separator());
+		windowMenu.add(calcSalaryAction);
+		windowMenu.add(new Separator());
 		windowMenu.add(openConsoleAction);
 		menuBar.add(helpMenu);
 		helpMenu.add(aboutAction);
@@ -138,6 +146,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		toolbar.add(inputSalesLogAction);
 		toolbar.add(querySalesLogAction);
 		toolbar.add(statSalesLogAction);
+		toolbar.add(new Separator());
+		toolbar.add(calcSalaryAction);
 		toolbar.add(new Separator());
 		toolbar.add(openConsoleAction);
 	}

@@ -22,4 +22,9 @@
 		<property name="entityDao" ref="entityDao" />
 	</bean>
 
+	<bean id="salaryFacade" class="org.mingy.jsfs.facade.impl.SalaryFacadeImpl">
+		<property name="entityDao" ref="entityDao" />
+		<property name="rewardRuleFacade" ref="rewardRuleFacade" />
+	</bean>
+
 </beans>

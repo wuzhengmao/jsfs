@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.mingy.jsfs.facade.IRewardRuleFacade;
+import org.mingy.jsfs.model.INamedObject;
 import org.mingy.jsfs.model.Position;
 import org.mingy.jsfs.model.RewardRule;
 import org.mingy.jsfs.ui.model.Catalog;
@@ -167,8 +168,8 @@ public class RewardRuleEditor extends AbstractFormEditor<RewardRule> {
 		dataBindingContext.bindSet(observeMultiSelectionTvPosition,
 				positionsRuleObserveSet, null, null);
 		bindSelection(cvGoodsOrType, bean, "goodsOrType",
-				new CatalogToValueConverter(Object.class),
-				new ValueToCatalogConverter(Object.class));
+				new CatalogToValueConverter(INamedObject.class),
+				new ValueToCatalogConverter(INamedObject.class));
 		bindText(txtScript, bean, "script");
 		bindText(txtDescription, bean, "description");
 	}

@@ -132,6 +132,43 @@ public class Calendars {
 	}
 
 	/**
+	 * 将指定的日历转换为7位长度的日期字串，日期格式为：yyyy-MM。
+	 * 
+	 * @param cal
+	 *            日历对象
+	 * @return 日期字串
+	 * @see #get7Date(Date)
+	 */
+	public static String get7Date(Calendar cal) {
+		return get7Date(cal.getTime());
+	}
+
+	/**
+	 * 将指定的日期转换为7位长度的日期字串，日期格式为：yyyy-MM。
+	 * 
+	 * @param date
+	 *            日期对象
+	 * @return 日期字串
+	 */
+	public static String get7Date(Date date) {
+		if (date == null) {
+			return "";
+		}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+		return sdf.format(date);
+	}
+
+	/**
+	 * 获得一个7位长度的当前日期字串
+	 * 
+	 * @return 日期字串
+	 * @see #get7Date(Date)
+	 */
+	public static String get7Date() {
+		return get7Date(new Date());
+	}
+
+	/**
 	 * 将指定的日历转换为12位长度的时间字串，日期格式为：HH:mm:ss.SSS。
 	 * 
 	 * @param cal

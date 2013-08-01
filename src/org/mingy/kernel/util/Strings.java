@@ -1,5 +1,6 @@
 package org.mingy.kernel.util;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -657,5 +658,15 @@ public abstract class Strings {
 		} catch (Exception e) {
 			return null;
 		}
+	}
+	
+	public static String format(Double value, int digit) {
+		if (value == null)
+			return "";
+		String s = "#,##0";
+		for (int i = 0; i < digit; i++) {
+			s+= i > 0? "0" : ".0";
+		}
+		return new DecimalFormat(s).format(value);
 	}
 }
