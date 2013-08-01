@@ -135,5 +135,29 @@
                hasPages="false">
          </wizard>
    </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.mingy.jsfs.application"
+            name="门店记账结算系统">
+         <property
+               name="appName"
+               value="门店记账结算系统">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/alt_about.gif">
+         </property>
+         <property
+               name="aboutText"
+               value="基于RCP的一个简单的门店记账结算系统。&#x0A;Email：zhengmao.w@gmail.com">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+         </property>
+      </product>
+   </extension>
  
 </plugin>
