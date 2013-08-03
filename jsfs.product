@@ -23,6 +23,7 @@ Email：zhengmao.w@gmail.com
 
    <windowImages i16="/jsfs/icons/alt_window_16.gif" i32="/jsfs/icons/alt_window_32.gif"/>
 
+
    <launcher name="jsfs">
       <solaris/>
       <win useIco="false">

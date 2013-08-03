@@ -88,6 +88,16 @@
             id="org.mingy.jsfs.ui.calcSalary">
       </command>
       <command
+            name="数据备份..."
+            description="将数据库备份到文件"
+            id="org.mingy.jsfs.ui.backupDatabase">
+      </command>
+      <command
+            name="数据还原..."
+            description="根据备份文件还原数据库"
+            id="org.mingy.jsfs.ui.restoreDatabase">
+      </command>
+      <command
             name="控制台"
             description="打开控制台以显示日志"
             id="org.mingy.jsfs.ui.openConsole">

@@ -15,5 +15,7 @@ public interface ICommandIds {
 	public static final String CMD_STAT_SALES_LOG = "org.mingy.jsfs.ui.statSalesLog";
 	public static final String CMD_CALC_SALARY = "org.mingy.jsfs.ui.calcSalary";
 	public static final String CMD_OPEN_CONSOLE = "org.mingy.jsfs.ui.openConsole";
+	public static final String CMD_BACKUP_DATABASE = "org.mingy.jsfs.ui.backupDatabase";
+	public static final String CMD_RESTORE_DATABASE = "org.mingy.jsfs.ui.restoreDatabase";
 
 }

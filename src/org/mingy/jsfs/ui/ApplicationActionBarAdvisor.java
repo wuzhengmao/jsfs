@@ -29,6 +29,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IAction querySalesLogAction;
 	private IAction statSalesLogAction;
 	private IAction calcSalaryAction;
+	private IAction backupDatabaseAction;
+	private IAction restoreDatabaseAction;
 	private IAction openConsoleAction;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
@@ -93,6 +95,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			register(calcSalaryAction);
 		}
 		{
+			backupDatabaseAction = new BackupDatabaseAction(window,
+					"数据备份(&B)...");
+			backupDatabaseAction.setToolTipText("将数据库备份到文件");
+			register(backupDatabaseAction);
+		}
+		{
+			restoreDatabaseAction = new RestoreDatabaseAction(window,
+					"数据还原(&R)...");
+			restoreDatabaseAction.setToolTipText("根据备份文件还原数据库");
+			register(restoreDatabaseAction);
+		}
+		{
 			openConsoleAction = new OpenConsoleAction(window, "控制台(&L)");
 			openConsoleAction.setToolTipText("打开控制台输出日志");
 			register(openConsoleAction);
@@ -127,6 +141,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		windowMenu.add(new Separator());
 		windowMenu.add(calcSalaryAction);
 		windowMenu.add(new Separator());
+		windowMenu.add(backupDatabaseAction);
+		windowMenu.add(restoreDatabaseAction);
+		windowMenu.add(new Separator());
 		windowMenu.add(openConsoleAction);
 		menuBar.add(helpMenu);
 		helpMenu.add(aboutAction);
@@ -148,6 +165,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		toolbar.add(statSalesLogAction);
 		toolbar.add(new Separator());
 		toolbar.add(calcSalaryAction);
+		toolbar.add(new Separator());
+		toolbar.add(backupDatabaseAction);
+		toolbar.add(restoreDatabaseAction);
 		toolbar.add(new Separator());
 		toolbar.add(openConsoleAction);
 	}

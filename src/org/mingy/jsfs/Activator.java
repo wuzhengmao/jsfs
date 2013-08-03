@@ -1,8 +1,15 @@
 package org.mingy.jsfs;
 
+import java.io.File;
+import java.net.URL;
+
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.mingy.kernel.context.GlobalBeanContext;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -81,5 +88,23 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	public static String getPath(String path) {
+		Bundle bundle = Platform.getBundle(PLUGIN_ID);
+		if (bundle != null) {
+			URL url = FileLocator.find(bundle, Path.fromOSString(path), null);
+			if (url != null) {
+				try {
+					url = FileLocator.toFileURL(url);
+					if (url != null) {
+						return new File(url.toURI()).getAbsolutePath();
+					}
+				} catch (Exception e) {
+					// ignore
+				}
+			}
+		}
+		return null;
 	}
 }
