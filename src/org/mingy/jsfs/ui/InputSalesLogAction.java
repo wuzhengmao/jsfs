@@ -15,6 +15,8 @@ public class InputSalesLogAction extends Action {
 		setActionDefinitionId(ICommandIds.CMD_INPUT_SALES_LOG);
 		setImageDescriptor(Activator
 				.getImageDescriptor("/icons/edit_sales_log.gif"));
+		setDisabledImageDescriptor(Activator
+				.getImageDescriptor("/icons/edit_sales_log_disabled.gif"));
 	}
 
 	@Override

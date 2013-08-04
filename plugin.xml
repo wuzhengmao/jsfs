@@ -27,6 +27,11 @@
             name="员工维护">
       </editor>
       <editor
+            class="org.mingy.jsfs.ui.ViewStaffEditor"
+            id="org.mingy.jsfs.ui.ViewStaffEditor"
+            name="员工查看">
+      </editor>
+      <editor
             class="org.mingy.jsfs.ui.GoodsEditor"
             id="org.mingy.jsfs.ui.GoodsEditor"
             name="商品维护">

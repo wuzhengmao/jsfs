@@ -16,9 +16,7 @@ import org.mingy.jsfs.facade.IStaffFacade;
 import org.mingy.jsfs.model.Position;
 import org.mingy.jsfs.model.Staff;
 import org.mingy.jsfs.ui.model.Catalog;
-import org.mingy.jsfs.ui.model.CatalogToValueConverter;
 import org.mingy.jsfs.ui.model.Catalogs;
-import org.mingy.jsfs.ui.model.ValueToCatalogConverter;
 import org.mingy.jsfs.ui.util.UIUtils;
 import org.mingy.kernel.context.GlobalBeanContext;
 
@@ -107,6 +105,12 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 		cvPosition.getCombo().setLayoutData(
 				new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		cvPosition.addSelectionChangedListener(defaultModifyListener);
+		ObservableListContentProvider listContentProvider = new ObservableListContentProvider();
+		IObservableMap observeMap = BeansObservables.observeMap(
+				listContentProvider.getKnownElements(), Position.class, "name");
+		cvPosition.setLabelProvider(new ObservableMapLabelProvider(observeMap));
+		cvPosition.setContentProvider(listContentProvider);
+		cvPosition.setInput(Catalogs.getPositionList());
 
 		Label label_5 = new Label(container, SWT.NONE);
 		label_5.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false,
@@ -127,16 +131,7 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 		bindSelection(cvSex, bean, "sex");
 		bindSelection(dtBirthday, bean, "birthday");
 		bindText(txtContacts, bean, "contacts");
-		ObservableListContentProvider listContentProvider = new ObservableListContentProvider();
-		IObservableMap observeMap = BeansObservables.observeMap(
-				listContentProvider.getKnownElements(), Catalog.class, "label");
-		cvPosition.setLabelProvider(new ObservableMapLabelProvider(observeMap));
-		cvPosition.setContentProvider(listContentProvider);
-		cvPosition.setInput(Catalogs.getCatalog(Catalog.TYPE_STAFF)
-				.getChildren());
-		bindSelection(cvPosition, bean, "position",
-				new CatalogToValueConverter(Position.class),
-				new ValueToCatalogConverter(Position.class));
+		bindSelection(cvPosition, bean, "position");
 		bindText(txtMemo, bean, "memo");
 	}
 

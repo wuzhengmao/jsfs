@@ -16,6 +16,9 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.mingy.jsfs.model.Role;
+import org.mingy.jsfs.model.RoleManager;
+import org.mingy.jsfs.model.RoleManager.RoleChangeListener;
 import org.mingy.jsfs.ui.util.PartAdapter;
 import org.mingy.kernel.util.Langs;
 
@@ -32,13 +35,22 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	}
 
 	public void preWindowOpen() {
-		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 		Rectangle screenSize = Display.getDefault().getClientArea();
 		configurer
 				.setInitialSize(new Point(screenSize.width, screenSize.height));
 		configurer.setShowCoolBar(true);
 		configurer.setShowStatusLine(true);
-		configurer.setTitle(Langs.getText("system.title"));
+		configurer.setTitle(Langs.getText("system.title") + " - ["
+				+ RoleManager.getInstance().getRole() + "]");
+		RoleManager.getInstance().addRoleChangeListener(
+				new RoleChangeListener() {
+					@Override
+					public void onChange(Role oldRole, Role newRole) {
+						configurer.setTitle(Langs.getText("system.title")
+								+ " - [" + newRole + "]");
+					}
+				});
 	}
 
 	public void postWindowOpen() {

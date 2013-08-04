@@ -15,6 +15,8 @@ public class CalcSalaryAction extends Action {
 		setActionDefinitionId(ICommandIds.CMD_CALC_SALARY);
 		setImageDescriptor(Activator
 				.getImageDescriptor("/icons/calc_salary.gif"));
+		setDisabledImageDescriptor(Activator
+				.getImageDescriptor("/icons/calc_salary_disabled.gif"));
 	}
 
 	@Override
