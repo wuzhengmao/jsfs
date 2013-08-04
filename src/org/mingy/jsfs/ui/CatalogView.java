@@ -109,7 +109,6 @@ public class CatalogView extends ViewPart {
 			}
 		};
 		treeViewer.setLabelProvider(labelProvider);
-		treeViewer.setAutoExpandLevel(2);
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
@@ -601,6 +600,10 @@ public class CatalogView extends ViewPart {
 			Catalogs.loadAll();
 		}
 		treeViewer.setInput(Catalogs.getCatalog(Catalog.TYPE_ROOT));
+		treeViewer.setExpandedState(Catalogs.getCatalog(Catalog.TYPE_STAFF),
+				true);
+		treeViewer.setExpandedState(Catalogs.getCatalog(Catalog.TYPE_GOODS),
+				true);
 		for (IEditorPart editor : getEditors()) {
 			Catalog catalog = (Catalog) editor.getEditorInput().getAdapter(
 					Catalog.class);

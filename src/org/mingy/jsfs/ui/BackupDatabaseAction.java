@@ -3,9 +3,10 @@ package org.mingy.jsfs.ui;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -144,9 +145,10 @@ public class BackupDatabaseAction extends Action {
 		public void run() {
 			try {
 				BufferedWriter writer = file != null ? new BufferedWriter(
-						new FileWriter(file)) : null;
+						new OutputStreamWriter(new FileOutputStream(file),
+								"utf-8")) : null;
 				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(in));
+						new InputStreamReader(in, "utf-8"));
 				String line = null;
 				while ((line = reader.readLine()) != null) {
 					if (writer != null) {

@@ -1,7 +1,7 @@
 package org.mingy.jsfs.ui;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -77,9 +77,11 @@ public class RestoreDatabaseAction extends Action {
 								new Thread(new StreamDrainer(process
 										.getErrorStream())).start();
 								OutputStreamWriter writer = new OutputStreamWriter(
-										process.getOutputStream());
+										process.getOutputStream(), "utf-8");
 								BufferedReader reader = new BufferedReader(
-										new FileReader(path));
+										new InputStreamReader(
+												new FileInputStream(path),
+												"utf-8"));
 								String line;
 								while ((line = reader.readLine()) != null) {
 									writer.write(line + "\n");
