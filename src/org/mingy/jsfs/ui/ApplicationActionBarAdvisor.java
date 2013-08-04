@@ -117,6 +117,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void fillMenuBar(IMenuManager menuBar) {
 		MenuManager fileMenu = new MenuManager("文件(&F)",
 				IWorkbenchActionConstants.M_FILE);
+		MenuManager launchMenu = new MenuManager("运行(&R)",
+				IWorkbenchActionConstants.M_LAUNCH);
 		MenuManager windowMenu = new MenuManager("窗口(&W)",
 				IWorkbenchActionConstants.M_WINDOW);
 		MenuManager helpMenu = new MenuManager("帮助(&H)",
@@ -132,17 +134,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(saveAllAction);
 		fileMenu.add(new Separator());
 		fileMenu.add(quitAction);
+		menuBar.add(launchMenu);
+		launchMenu.add(inputSalesLogAction);
+		launchMenu.add(querySalesLogAction);
+		launchMenu.add(statSalesLogAction);
+		launchMenu.add(new Separator());
+		launchMenu.add(calcSalaryAction);
+		launchMenu.add(new Separator());
+		launchMenu.add(backupDatabaseAction);
+		launchMenu.add(restoreDatabaseAction);
 		menuBar.add(windowMenu);
 		windowMenu.add(openCatalogAction);
-		fileMenu.add(new Separator());
-		windowMenu.add(inputSalesLogAction);
-		windowMenu.add(querySalesLogAction);
-		windowMenu.add(statSalesLogAction);
-		windowMenu.add(new Separator());
-		windowMenu.add(calcSalaryAction);
-		windowMenu.add(new Separator());
-		windowMenu.add(backupDatabaseAction);
-		windowMenu.add(restoreDatabaseAction);
 		windowMenu.add(new Separator());
 		windowMenu.add(openConsoleAction);
 		menuBar.add(helpMenu);
