@@ -8,10 +8,13 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 
+import org.eclipse.core.databinding.Binding;
 import org.eclipse.core.databinding.DataBindingContext;
 import org.eclipse.core.databinding.UpdateValueStrategy;
 import org.eclipse.core.databinding.beans.PojoProperties;
 import org.eclipse.core.databinding.conversion.Converter;
+import org.eclipse.core.databinding.observable.DisposeEvent;
+import org.eclipse.core.databinding.observable.IDisposeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.databinding.swt.WidgetProperties;
@@ -82,135 +85,154 @@ public abstract class UIUtils {
 		return controlDecoration;
 	}
 
-	public static void bindText(DataBindingContext dataBindingContext,
+	public static Binding bindText(DataBindingContext dataBindingContext,
 			Control control, Object bean, String propName,
 			Map<Control, ControlDecoration> decoratorMap) {
 		IObservableValue observeWidget = WidgetProperties.text(SWT.Modify)
 				.observe(control);
-		bind(dataBindingContext, observeWidget, control, bean, propName, null,
-				null, decoratorMap);
+		return bind(dataBindingContext, observeWidget, control, bean, propName,
+				null, null, decoratorMap);
 	}
 
-	public static void bindText(DataBindingContext dataBindingContext,
+	public static Binding bindText(DataBindingContext dataBindingContext,
 			Control control, Object bean, String propName,
 			Converter targetToModelConverter, Converter modelToTargetConverter,
 			Map<Control, ControlDecoration> decoratorMap) {
 		IObservableValue observeWidget = WidgetProperties.text(SWT.Modify)
 				.observe(control);
-		bind(dataBindingContext, observeWidget, control, bean, propName,
+		return bind(dataBindingContext, observeWidget, control, bean, propName,
 				targetToModelConverter, modelToTargetConverter, decoratorMap);
 	}
 
-	public static void bindText(DataBindingContext dataBindingContext,
+	public static Binding bindText(DataBindingContext dataBindingContext,
 			Control control, Object bean, String propName,
 			Converter targetToModelConverter, Converter modelToTargetConverter,
 			Map<Control, ControlDecoration> decoratorMap,
 			IAggregateValidateListener listener) {
 		IObservableValue observeWidget = WidgetProperties.text(SWT.Modify)
 				.observe(control);
-		bind(dataBindingContext, observeWidget, control, bean, propName,
+		return bind(dataBindingContext, observeWidget, control, bean, propName,
 				targetToModelConverter, modelToTargetConverter, decoratorMap,
 				listener);
 	}
 
-	public static void bindSelection(DataBindingContext dataBindingContext,
+	public static Binding bindSelection(DataBindingContext dataBindingContext,
 			Control control, Object bean, String propName,
 			Map<Control, ControlDecoration> decoratorMap) {
 		IObservableValue observeWidget = WidgetProperties.selection().observe(
 				control);
-		bind(dataBindingContext, observeWidget, control, bean, propName, null,
-				null, decoratorMap);
+		return bind(dataBindingContext, observeWidget, control, bean, propName,
+				null, null, decoratorMap);
 	}
 
-	public static void bindSelection(DataBindingContext dataBindingContext,
+	public static Binding bindSelection(DataBindingContext dataBindingContext,
 			Control control, Object bean, String propName,
 			Converter targetToModelConverter, Converter modelToTargetConverter,
 			Map<Control, ControlDecoration> decoratorMap) {
 		IObservableValue observeWidget = WidgetProperties.selection().observe(
 				control);
-		bind(dataBindingContext, observeWidget, control, bean, propName,
+		return bind(dataBindingContext, observeWidget, control, bean, propName,
 				targetToModelConverter, modelToTargetConverter, decoratorMap);
 	}
 
-	public static void bindSelection(DataBindingContext dataBindingContext,
+	public static Binding bindSelection(DataBindingContext dataBindingContext,
 			Control control, Object bean, String propName,
 			Converter targetToModelConverter, Converter modelToTargetConverter,
 			Map<Control, ControlDecoration> decoratorMap,
 			IAggregateValidateListener listener) {
 		IObservableValue observeWidget = WidgetProperties.selection().observe(
 				control);
-		bind(dataBindingContext, observeWidget, control, bean, propName,
+		return bind(dataBindingContext, observeWidget, control, bean, propName,
 				targetToModelConverter, modelToTargetConverter, decoratorMap,
 				listener);
 	}
 
-	public static void bindSelection(DataBindingContext dataBindingContext,
+	public static Binding bindSelection(DataBindingContext dataBindingContext,
 			Viewer viewer, Object bean, String propName,
 			Map<Control, ControlDecoration> decoratorMap) {
 		IObservableValue observeWidget = ViewerProperties.singleSelection()
 				.observe(viewer);
-		bind(dataBindingContext, observeWidget, viewer.getControl(), bean,
-				propName, null, null, decoratorMap);
+		return bind(dataBindingContext, observeWidget, viewer.getControl(),
+				bean, propName, null, null, decoratorMap);
 	}
 
-	public static void bindSelection(DataBindingContext dataBindingContext,
+	public static Binding bindSelection(DataBindingContext dataBindingContext,
 			Viewer viewer, Object bean, String propName,
 			Converter targetToModelConverter, Converter modelToTargetConverter,
 			Map<Control, ControlDecoration> decoratorMap) {
 		IObservableValue observeWidget = ViewerProperties.singleSelection()
 				.observe(viewer);
-		bind(dataBindingContext, observeWidget, viewer.getControl(), bean,
-				propName, targetToModelConverter, modelToTargetConverter,
+		return bind(dataBindingContext, observeWidget, viewer.getControl(),
+				bean, propName, targetToModelConverter, modelToTargetConverter,
 				decoratorMap);
 	}
 
-	public static void bindSelection(DataBindingContext dataBindingContext,
+	public static Binding bindSelection(DataBindingContext dataBindingContext,
 			Viewer viewer, Object bean, String propName,
 			Converter targetToModelConverter, Converter modelToTargetConverter,
 			Map<Control, ControlDecoration> decoratorMap,
 			IAggregateValidateListener listener) {
 		IObservableValue observeWidget = ViewerProperties.singleSelection()
 				.observe(viewer);
-		bind(dataBindingContext, observeWidget, viewer.getControl(), bean,
-				propName, targetToModelConverter, modelToTargetConverter,
+		return bind(dataBindingContext, observeWidget, viewer.getControl(),
+				bean, propName, targetToModelConverter, modelToTargetConverter,
 				decoratorMap, listener);
 	}
 
-	private static void bind(DataBindingContext dataBindingContext,
+	private static Binding bind(DataBindingContext dataBindingContext,
 			IObservableValue observeWidget, Control control, Object bean,
 			String propName, Converter targetToModelConverter,
 			Converter modelToTargetConverter,
 			Map<Control, ControlDecoration> decoratorMap) {
+		final ControlDecoration controlDecoration = createControlDecoration(
+				control, decoratorMap);
 		IObservableValue observeValue = PojoProperties.value(propName).observe(
 				bean);
 		UpdateValueStrategy targetToModel = new UpdateValueStrategy();
 		targetToModel.setConverter(targetToModelConverter);
 		targetToModel.setAfterConvertValidator(new Jsr303BeanValidator(bean
-				.getClass(), propName, createControlDecoration(control,
-				decoratorMap)));
+				.getClass(), propName, controlDecoration));
 		UpdateValueStrategy modelToTarget = new UpdateValueStrategy();
 		modelToTarget.setConverter(modelToTargetConverter);
-		dataBindingContext.bindValue(observeWidget, observeValue,
-				targetToModel, modelToTarget);
+		Binding binding = dataBindingContext.bindValue(observeWidget,
+				observeValue, targetToModel, modelToTarget);
+		binding.getValidationStatus().addDisposeListener(
+				new IDisposeListener() {
+					@Override
+					public void handleDispose(DisposeEvent event) {
+						controlDecoration.dispose();
+					}
+				});
+		return binding;
 	}
 
-	private static void bind(DataBindingContext dataBindingContext,
+	private static Binding bind(DataBindingContext dataBindingContext,
 			IObservableValue observeWidget, Control control, Object bean,
 			String propName, Converter targetToModelConverter,
 			Converter modelToTargetConverter,
 			Map<Control, ControlDecoration> decoratorMap,
 			IAggregateValidateListener listener) {
+		final ControlDecoration controlDecoration = createControlDecoration(
+				control, decoratorMap);
 		IObservableValue observeValue = PojoProperties.value(propName).observe(
 				bean);
 		UpdateValueStrategy targetToModel = new UpdateValueStrategy();
 		targetToModel.setConverter(targetToModelConverter);
 		targetToModel.setAfterConvertValidator(new MyJsr303BeanValidator(bean
-				.getClass(), propName, createControlDecoration(control,
-				decoratorMap), decoratorMap, listener));
+				.getClass(), propName, controlDecoration, decoratorMap,
+				listener));
 		UpdateValueStrategy modelToTarget = new UpdateValueStrategy();
 		modelToTarget.setConverter(modelToTargetConverter);
-		dataBindingContext.bindValue(observeWidget, observeValue,
-				targetToModel, modelToTarget);
+		Binding binding = dataBindingContext.bindValue(observeWidget,
+				observeValue, targetToModel, modelToTarget);
+		binding.getValidationStatus().addDisposeListener(
+				new IDisposeListener() {
+					@Override
+					public void handleDispose(DisposeEvent event) {
+						controlDecoration.dispose();
+					}
+				});
+		return binding;
 	}
 
 	private static class MyJsr303BeanValidator extends Jsr303BeanValidator {
