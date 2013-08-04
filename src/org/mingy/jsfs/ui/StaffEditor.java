@@ -123,10 +123,6 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 
 	@Override
 	protected void initDataBindings(Staff bean) {
-		bindText(txtName, bean, "name");
-		bindSelection(cvSex, bean, "sex");
-		bindSelection(dtBirthday, bean, "birthday");
-		bindText(txtContacts, bean, "contacts");
 		ObservableListContentProvider listContentProvider = new ObservableListContentProvider();
 		IObservableMap observeMap = BeansObservables.observeMap(
 				listContentProvider.getKnownElements(), Catalog.class, "label");
@@ -134,6 +130,10 @@ public class StaffEditor extends AbstractFormEditor<Staff> {
 		cvPosition.setContentProvider(listContentProvider);
 		cvPosition.setInput(Catalogs.getCatalog(Catalog.TYPE_STAFF)
 				.getChildren());
+		bindText(txtName, bean, "name");
+		bindSelection(cvSex, bean, "sex");
+		bindSelection(dtBirthday, bean, "birthday");
+		bindText(txtContacts, bean, "contacts");
 		bindSelection(cvPosition, bean, "position",
 				new CatalogToValueConverter(Position.class),
 				new ValueToCatalogConverter(Position.class));

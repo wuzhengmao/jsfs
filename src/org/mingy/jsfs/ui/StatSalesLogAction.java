@@ -15,6 +15,8 @@ public class StatSalesLogAction extends Action {
 		setActionDefinitionId(ICommandIds.CMD_STAT_SALES_LOG);
 		setImageDescriptor(Activator
 				.getImageDescriptor("/icons/stat_sales_log.gif"));
+		setDisabledImageDescriptor(Activator
+				.getImageDescriptor("/icons/stat_sales_log_disabled.gif"));
 	}
 
 	@Override

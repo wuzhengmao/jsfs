@@ -42,6 +42,8 @@ import org.mingy.jsfs.model.Goods;
 import org.mingy.jsfs.model.GoodsType;
 import org.mingy.jsfs.model.Position;
 import org.mingy.jsfs.model.RewardRule;
+import org.mingy.jsfs.model.Role;
+import org.mingy.jsfs.model.RoleManager;
 import org.mingy.jsfs.model.Staff;
 import org.mingy.jsfs.ui.model.Catalog;
 import org.mingy.jsfs.ui.model.Catalogs;
@@ -109,15 +111,16 @@ public class CatalogView extends ViewPart {
 			}
 		};
 		treeViewer.setLabelProvider(labelProvider);
-		treeViewer.setAutoExpandLevel(2);
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				Catalog catalog = getSelectedItem();
 				if (catalog != null) {
 					addAction.setEnabled(catalog.isRoot() || catalog.isSub());
-					editAction.setEnabled(!catalog.isRoot());
-					deleteAction.setEnabled(!catalog.isRoot());
+					editAction.setEnabled(!catalog.isRoot()
+							&& RoleManager.getInstance().getRole() == Role.ADMIN);
+					deleteAction.setEnabled(!catalog.isRoot()
+							&& RoleManager.getInstance().getRole() == Role.ADMIN);
 				} else {
 					addAction.setEnabled(false);
 					editAction.setEnabled(false);
@@ -273,19 +276,28 @@ public class CatalogView extends ViewPart {
 					try {
 						switch (catalog.getRoot().getType()) {
 						case Catalog.TYPE_STAFF:
-							getSite().getPage().openEditor(
-									new CatalogEditorInput(catalog),
-									StaffEditor.ID);
+							getSite()
+									.getPage()
+									.openEditor(
+											new CatalogEditorInput(catalog),
+											RoleManager.getInstance().getRole() == Role.ADMIN ? StaffEditor.ID
+													: ViewStaffEditor.ID);
 							break;
 						case Catalog.TYPE_GOODS:
-							getSite().getPage().openEditor(
-									new CatalogEditorInput(catalog),
-									GoodsEditor.ID);
+							getSite()
+									.getPage()
+									.openEditor(
+											new CatalogEditorInput(catalog),
+											RoleManager.getInstance().getRole() == Role.ADMIN ? GoodsEditor.ID
+													: ViewGoodsEditor.ID);
 							break;
 						case Catalog.TYPE_RULE:
-							getSite().getPage().openEditor(
-									new CatalogEditorInput(catalog),
-									RewardRuleEditor.ID);
+							getSite()
+									.getPage()
+									.openEditor(
+											new CatalogEditorInput(catalog),
+											RoleManager.getInstance().getRole() == Role.ADMIN ? RewardRuleEditor.ID
+													: ViewRewardRuleEditor.ID);
 							break;
 						}
 					} catch (PartInitException e) {
@@ -601,6 +613,10 @@ public class CatalogView extends ViewPart {
 			Catalogs.loadAll();
 		}
 		treeViewer.setInput(Catalogs.getCatalog(Catalog.TYPE_ROOT));
+		treeViewer.setExpandedState(Catalogs.getCatalog(Catalog.TYPE_STAFF),
+				true);
+		treeViewer.setExpandedState(Catalogs.getCatalog(Catalog.TYPE_GOODS),
+				true);
 		for (IEditorPart editor : getEditors()) {
 			Catalog catalog = (Catalog) editor.getEditorInput().getAdapter(
 					Catalog.class);

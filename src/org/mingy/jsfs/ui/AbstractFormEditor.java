@@ -108,6 +108,12 @@ public abstract class AbstractFormEditor<T> extends EditorPart {
 				decoratorMap);
 	}
 
+	protected void bindText(Control control, Object bean, String propName,
+			Converter targetToModelConverter, Converter modelToTargetConverter) {
+		UIUtils.bindText(dataBindingContext, control, bean, propName,
+				targetToModelConverter, modelToTargetConverter, decoratorMap);
+	}
+
 	protected void bindSelection(Control control, Object bean, String propName) {
 		UIUtils.bindSelection(dataBindingContext, control, bean, propName,
 				decoratorMap);

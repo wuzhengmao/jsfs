@@ -134,6 +134,10 @@ public class GoodsEditor extends AbstractFormEditor<Goods> {
 
 	@Override
 	public void setFocus() {
-		txtName.setFocus();
+		if (cvType.getSelection().isEmpty()) {
+			cvType.getCombo().setFocus();
+		} else {
+			txtName.setFocus();
+		}
 	}
 }

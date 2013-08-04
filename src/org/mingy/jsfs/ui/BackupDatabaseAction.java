@@ -38,6 +38,8 @@ public class BackupDatabaseAction extends Action {
 		setActionDefinitionId(ICommandIds.CMD_BACKUP_DATABASE);
 		setImageDescriptor(Activator
 				.getImageDescriptor("/icons/backup_database.gif"));
+		setDisabledImageDescriptor(Activator
+				.getImageDescriptor("/icons/backup_database_disabled.gif"));
 	}
 
 	@Override

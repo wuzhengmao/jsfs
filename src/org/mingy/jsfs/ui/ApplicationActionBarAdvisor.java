@@ -14,6 +14,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
+import org.mingy.jsfs.model.Role;
+import org.mingy.jsfs.model.RoleManager;
+import org.mingy.jsfs.model.RoleManager.RoleChangeListener;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
@@ -111,6 +114,21 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			openConsoleAction.setToolTipText("打开控制台输出日志");
 			register(openConsoleAction);
 		}
+		statSalesLogAction.setEnabled(false);
+		calcSalaryAction.setEnabled(false);
+		backupDatabaseAction.setEnabled(false);
+		restoreDatabaseAction.setEnabled(false);
+		RoleManager.getInstance().addRoleChangeListener(
+				new RoleChangeListener() {
+					@Override
+					public void onChange(Role oldRole, Role newRole) {
+						statSalesLogAction
+								.setEnabled(newRole == Role.ACCOUNTING);
+						calcSalaryAction.setEnabled(newRole == Role.ACCOUNTING);
+						backupDatabaseAction.setEnabled(newRole == Role.ADMIN);
+						restoreDatabaseAction.setEnabled(newRole == Role.ADMIN);
+					}
+				});
 	}
 
 	@Override

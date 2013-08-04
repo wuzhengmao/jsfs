@@ -36,6 +36,8 @@ public class RestoreDatabaseAction extends Action {
 		setActionDefinitionId(ICommandIds.CMD_RESTORE_DATABASE);
 		setImageDescriptor(Activator
 				.getImageDescriptor("/icons/restore_database.gif"));
+		setDisabledImageDescriptor(Activator
+				.getImageDescriptor("/icons/restore_database_disabled.gif"));
 	}
 
 	@Override

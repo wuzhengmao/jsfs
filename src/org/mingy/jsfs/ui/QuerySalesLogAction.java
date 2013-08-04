@@ -15,6 +15,8 @@ public class QuerySalesLogAction extends Action {
 		setActionDefinitionId(ICommandIds.CMD_QUERY_SALES_LOG);
 		setImageDescriptor(Activator
 				.getImageDescriptor("/icons/query_sales_log.gif"));
+		setDisabledImageDescriptor(Activator
+				.getImageDescriptor("/icons/query_sales_log_disabled.gif"));
 	}
 
 	@Override
