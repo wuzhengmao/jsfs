@@ -35,6 +35,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IAction backupDatabaseAction;
 	private IAction restoreDatabaseAction;
 	private IAction openConsoleAction;
+	private IAction loginAction;
+	private IAction logoutAction;
+	private IAction changePasswordAction;
 
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
@@ -114,10 +117,27 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			openConsoleAction.setToolTipText("打开控制台输出日志");
 			register(openConsoleAction);
 		}
+		{
+			loginAction = new LoginAction(window, "登录(&L)...");
+			loginAction.setToolTipText("以其他身份登录");
+			register(loginAction);
+		}
+		{
+			logoutAction = new LogoutAction(window, "注销(&O)");
+			logoutAction.setToolTipText("注销当前身份");
+			register(logoutAction);
+		}
+		{
+			changePasswordAction = new ChangePasswordAction(window, "更改口令(&P)...");
+			changePasswordAction.setToolTipText("更改当前身份的口令");
+			register(changePasswordAction);
+		}
 		statSalesLogAction.setEnabled(false);
 		calcSalaryAction.setEnabled(false);
 		backupDatabaseAction.setEnabled(false);
 		restoreDatabaseAction.setEnabled(false);
+		logoutAction.setEnabled(false);
+		changePasswordAction.setEnabled(false);
 		RoleManager.getInstance().addRoleChangeListener(
 				new RoleChangeListener() {
 					@Override
@@ -127,6 +147,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 						calcSalaryAction.setEnabled(newRole == Role.ACCOUNTING);
 						backupDatabaseAction.setEnabled(newRole == Role.ADMIN);
 						restoreDatabaseAction.setEnabled(newRole == Role.ADMIN);
+						logoutAction.setEnabled(newRole != Role.GUEST);
+						changePasswordAction.setEnabled(newRole != Role.GUEST);
 					}
 				});
 	}
@@ -166,6 +188,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		windowMenu.add(new Separator());
 		windowMenu.add(openConsoleAction);
 		menuBar.add(helpMenu);
+		helpMenu.add(loginAction);
+		helpMenu.add(logoutAction);
+		helpMenu.add(changePasswordAction);
+		helpMenu.add(new Separator());
 		helpMenu.add(aboutAction);
 	}
 

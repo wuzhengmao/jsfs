@@ -117,6 +117,21 @@
             description="打开控制台以显示日志"
             id="org.mingy.jsfs.ui.openConsole">
       </command>
+      <command
+            name="登录..."
+            description="以其他身份登录"
+            id="org.mingy.jsfs.ui.login">
+      </command>
+      <command
+            name="注销"
+            description="注销当前身份"
+            id="org.mingy.jsfs.ui.logout">
+      </command>
+      <command
+            name="更改口令..."
+            description="更改当前身份的口令"
+            id="org.mingy.jsfs.ui.changePassword">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

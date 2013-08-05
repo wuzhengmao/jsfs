@@ -16,11 +16,12 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.mingy.jsfs.facade.IConfigFacade;
 import org.mingy.jsfs.model.Role;
 import org.mingy.jsfs.model.RoleManager;
 import org.mingy.jsfs.model.RoleManager.RoleChangeListener;
 import org.mingy.jsfs.ui.util.PartAdapter;
-import org.mingy.kernel.util.Langs;
+import org.mingy.kernel.context.GlobalBeanContext;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
@@ -41,14 +42,19 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				.setInitialSize(new Point(screenSize.width, screenSize.height));
 		configurer.setShowCoolBar(true);
 		configurer.setShowStatusLine(true);
-		configurer.setTitle(Langs.getText("system.title") + " - ["
+		final IConfigFacade configFacade = GlobalBeanContext.getInstance()
+				.getBean(IConfigFacade.class);
+		configurer.setTitle(configFacade.getConfig("system.title") + " - ["
 				+ RoleManager.getInstance().getRole() + "]");
 		RoleManager.getInstance().addRoleChangeListener(
 				new RoleChangeListener() {
 					@Override
 					public void onChange(Role oldRole, Role newRole) {
-						configurer.setTitle(Langs.getText("system.title")
-								+ " - [" + newRole + "]");
+						configurer.setTitle(configFacade
+								.getConfig("system.title")
+								+ " - ["
+								+ newRole
+								+ "]");
 					}
 				});
 	}

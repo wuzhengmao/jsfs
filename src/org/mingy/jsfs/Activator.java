@@ -2,13 +2,17 @@ package org.mingy.jsfs;
 
 import java.io.File;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.mingy.jsfs.facade.IConfigFacade;
 import org.mingy.kernel.context.GlobalBeanContext;
+import org.mingy.kernel.crypto.Signature;
+import org.mingy.kernel.util.Langs;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -40,6 +44,7 @@ public class Activator extends AbstractUIPlugin {
 		super.start(context);
 		plugin = this;
 		loadApplicationContext();
+		initApplication();
 	}
 
 	/*
@@ -66,6 +71,33 @@ public class Activator extends AbstractUIPlugin {
 			GlobalBeanContext.getInstance().registerShutdownHook();
 		} finally {
 			Thread.currentThread().setContextClassLoader(oldLoader);
+		}
+	}
+
+	private void initApplication() {
+		IConfigFacade configFacade = GlobalBeanContext.getInstance().getBean(
+				IConfigFacade.class);
+		if (configFacade.getConfig("system.title") == null) {
+			configFacade.saveConfig("system.title",
+					Langs.getText("system.title"));
+		}
+		if (configFacade.getConfig("password.admin") == null) {
+			try {
+				String password = Signature.digestBase64("SHA",
+						"admin".getBytes());
+				configFacade.saveConfig("password.admin", password);
+			} catch (NoSuchAlgorithmException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		if (configFacade.getConfig("password.accounting") == null) {
+			try {
+				String password = Signature.digestBase64("SHA",
+						"account".getBytes());
+				configFacade.saveConfig("password.accounting", password);
+			} catch (NoSuchAlgorithmException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 

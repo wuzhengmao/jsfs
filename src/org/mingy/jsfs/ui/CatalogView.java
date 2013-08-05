@@ -114,18 +114,7 @@ public class CatalogView extends ViewPart {
 		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
-				Catalog catalog = getSelectedItem();
-				if (catalog != null) {
-					addAction.setEnabled(catalog.isRoot() || catalog.isSub());
-					editAction.setEnabled(!catalog.isRoot()
-							&& RoleManager.getInstance().getRole() == Role.ADMIN);
-					deleteAction.setEnabled(!catalog.isRoot()
-							&& RoleManager.getInstance().getRole() == Role.ADMIN);
-				} else {
-					addAction.setEnabled(false);
-					editAction.setEnabled(false);
-					deleteAction.setEnabled(false);
-				}
+				syncToolbarStatus();
 			}
 		});
 		treeViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -490,6 +479,21 @@ public class CatalogView extends ViewPart {
 		toolbarManager.add(addAction);
 		toolbarManager.add(editAction);
 		toolbarManager.add(deleteAction);
+	}
+
+	void syncToolbarStatus() {
+		Catalog catalog = getSelectedItem();
+		if (catalog != null) {
+			addAction.setEnabled(catalog.isRoot() || catalog.isSub());
+			editAction.setEnabled(!catalog.isRoot()
+					&& RoleManager.getInstance().getRole() == Role.ADMIN);
+			deleteAction.setEnabled(!catalog.isRoot()
+					&& RoleManager.getInstance().getRole() == Role.ADMIN);
+		} else {
+			addAction.setEnabled(false);
+			editAction.setEnabled(false);
+			deleteAction.setEnabled(false);
+		}
 	}
 
 	/**

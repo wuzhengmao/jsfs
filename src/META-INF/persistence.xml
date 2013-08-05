@@ -5,6 +5,7 @@
 	<persistence-unit name="jsfs" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 
+		<class>org.mingy.jsfs.model.orm.ConfigEntity</class>
 		<class>org.mingy.jsfs.model.orm.PositionEntity</class>
 		<class>org.mingy.jsfs.model.orm.StaffEntity</class>
 		<class>org.mingy.jsfs.model.orm.GoodsTypeEntity</class>
