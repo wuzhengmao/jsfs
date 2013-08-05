@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.mingy.jsfs.Activator;
+import org.mingy.jsfs.facade.IConfigFacade;
 import org.mingy.jsfs.facade.ISalesLogFacade;
 import org.mingy.jsfs.model.Goods;
 import org.mingy.jsfs.model.GoodsType;
@@ -67,6 +68,7 @@ import org.mingy.jsfs.ui.model.MergeTimeConverter;
 import org.mingy.jsfs.ui.util.IAggregateValidateListener;
 import org.mingy.jsfs.ui.util.UIUtils;
 import org.mingy.kernel.context.GlobalBeanContext;
+import org.mingy.kernel.util.Calendars;
 import org.mingy.kernel.util.Langs;
 import org.mingy.kernel.util.Strings;
 import org.mingy.kernel.util.Validators;
@@ -667,6 +669,27 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void okPressed() {
+		if (editMode
+				&& "LOCK".equals(GlobalBeanContext
+						.getInstance()
+						.getBean(IConfigFacade.class)
+						.getConfig(
+								Calendars.get10Date(originSalesLog
+										.getSalesTime())))) {
+			MessageDialog.openError(getShell(), Langs
+					.getText("error.save.title"), Langs.getText(
+					"error.save.message.salesLogLocked",
+					Calendars.get10Date(originSalesLog.getSalesTime())));
+			return;
+		} else if ("LOCK".equals(GlobalBeanContext.getInstance()
+				.getBean(IConfigFacade.class)
+				.getConfig(Calendars.get10Date(salesLog.getSalesTime())))) {
+			MessageDialog.openError(getShell(), Langs
+					.getText("error.save.title"), Langs.getText(
+					"error.save.message.salesLogLocked",
+					Calendars.get10Date(salesLog.getSalesTime())));
+			return;
+		}
 		try {
 			GlobalBeanContext.getInstance().getBean(ISalesLogFacade.class)
 					.saveSalesLog(salesLog);
@@ -707,6 +730,24 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 	protected void buttonPressed(int buttonId) {
 		super.buttonPressed(buttonId);
 		if (buttonId == IDialogConstants.IGNORE_ID) {
+			if ("LOCK"
+					.equals(GlobalBeanContext
+							.getInstance()
+							.getBean(IConfigFacade.class)
+							.getConfig(
+									Calendars.get10Date(originSalesLog
+											.getSalesTime())))) {
+				MessageDialog.openError(getShell(), Langs
+						.getText("error.delete.title"), Langs.getText(
+						"error.delete.message.salesLogLocked",
+						Calendars.get10Date(originSalesLog.getSalesTime())));
+				return;
+			}
+			if (!MessageDialog.openConfirm(getShell(),
+					Langs.getText("confirm.delete.title"),
+					Langs.getText("confirm.delete_salesLog.message"))) {
+				return;
+			}
 			GlobalBeanContext.getInstance().getBean(ISalesLogFacade.class)
 					.deleteSalesLog(salesLog.getId());
 			List<SalesLog> list = (List<SalesLog>) SalesLogListEditorInput

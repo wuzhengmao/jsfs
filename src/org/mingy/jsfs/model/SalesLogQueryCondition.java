@@ -9,6 +9,7 @@ public class SalesLogQueryCondition extends PropertyChangeSupportBean {
 	@NotNull(message = "{startDate.NotNull}")
 	private Date startDate;
 
+	@NotNull(message = "{endDate.NotNull}")
 	private Date endDate;
 
 	private Staff staff;

@@ -1,20 +1,25 @@
 package org.mingy.jsfs.facade.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.mingy.jsfs.facade.ISalesLogFacade;
 import org.mingy.jsfs.model.SalesLog;
 import org.mingy.jsfs.model.SalesLog.SalesLogDetail;
+import org.mingy.jsfs.model.SalesLogLockCondition;
 import org.mingy.jsfs.model.SalesLogQueryCondition;
 import org.mingy.jsfs.model.SalesLogStat;
+import org.mingy.jsfs.model.orm.ConfigEntity;
 import org.mingy.jsfs.model.orm.GoodsEntity;
 import org.mingy.jsfs.model.orm.SalesLogDetailEntity;
 import org.mingy.jsfs.model.orm.SalesLogEntity;
 import org.mingy.jsfs.model.orm.StaffEntity;
 import org.mingy.kernel.facade.IEntityDaoFacade;
 import org.mingy.kernel.util.Calendars;
+
+import com.ibm.icu.util.Calendar;
 
 public class SalesLogFacadeImpl implements ISalesLogFacade {
 
@@ -143,6 +148,18 @@ public class SalesLogFacadeImpl implements ISalesLogFacade {
 				entityDao.delete(detailEntity);
 			}
 			entityDao.delete(entity);
+		}
+	}
+
+	@Override
+	public void lockSalesLog(SalesLogLockCondition condition) {
+		Date date = condition.getStartDate();
+		while (date.compareTo(condition.getEndDate()) < 0) {
+			ConfigEntity entity = new ConfigEntity();
+			entity.setId(Calendars.get10Date(date));
+			entity.setValue("LOCK");
+			entityDao.save(entity);
+			date = Calendars.calculate(date, Calendar.DATE, 1);
 		}
 	}
 

@@ -24,10 +24,12 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
+import org.mingy.jsfs.facade.IConfigFacade;
 import org.mingy.jsfs.model.SalesLog;
 import org.mingy.jsfs.model.SalesLog.SalesLogDetail;
 import org.mingy.jsfs.model.SalesLogQueryCondition;
 import org.mingy.jsfs.model.Staff;
+import org.mingy.kernel.context.GlobalBeanContext;
 import org.mingy.kernel.util.Calendars;
 
 public class SalesLogListEditor extends EditorPart {
@@ -87,8 +89,17 @@ public class SalesLogListEditor extends EditorPart {
 				if (!event.getSelection().isEmpty()) {
 					SalesLog salesLog = (SalesLog) ((IStructuredSelection) event
 							.getSelection()).getFirstElement();
-					new SalesLogEditDialog(getSite().getShell(), salesLog)
-							.open();
+					if (!"LOCK".equals(GlobalBeanContext
+							.getInstance()
+							.getBean(IConfigFacade.class)
+							.getConfig(
+									Calendars.get10Date(salesLog.getSalesTime())))) {
+						new SalesLogEditDialog(getSite().getShell(), salesLog)
+								.open();
+					} else {
+						new SalesLogViewDialog(getSite().getShell(), salesLog)
+								.open();
+					}
 				}
 			}
 		});
