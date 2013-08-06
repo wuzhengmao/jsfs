@@ -36,6 +36,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IAction backupDatabaseAction;
 	private IAction restoreDatabaseAction;
 	private IAction openConsoleAction;
+	private IAction preferenceAction;
 	private IAction loginAction;
 	private IAction logoutAction;
 	private IAction changePasswordAction;
@@ -124,6 +125,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			register(openConsoleAction);
 		}
 		{
+			preferenceAction = new PreferenceAction(window, "首选项(&P)");
+			preferenceAction.setToolTipText("设置首选项参数");
+			register(preferenceAction);
+		}
+		{
 			loginAction = new LoginAction(window, "登录(&L)...");
 			loginAction.setToolTipText("以其他身份登录");
 			register(loginAction);
@@ -196,8 +202,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		launchMenu.add(restoreDatabaseAction);
 		menuBar.add(windowMenu);
 		windowMenu.add(openCatalogAction);
-		windowMenu.add(new Separator());
 		windowMenu.add(openConsoleAction);
+		windowMenu.add(new Separator());
+		windowMenu.add(preferenceAction);
 		menuBar.add(helpMenu);
 		helpMenu.add(loginAction);
 		helpMenu.add(logoutAction);
@@ -223,9 +230,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		toolbar.add(lockSalesLogAction);
 		toolbar.add(new Separator());
 		toolbar.add(calcSalaryAction);
-		toolbar.add(new Separator());
-		toolbar.add(backupDatabaseAction);
-		toolbar.add(restoreDatabaseAction);
+		// toolbar.add(new Separator());
+		// toolbar.add(backupDatabaseAction);
+		// toolbar.add(restoreDatabaseAction);
 		toolbar.add(new Separator());
 		toolbar.add(openConsoleAction);
 	}

@@ -18,6 +18,7 @@ public interface ICommandIds {
 	public static final String CMD_OPEN_CONSOLE = "org.mingy.jsfs.ui.openConsole";
 	public static final String CMD_BACKUP_DATABASE = "org.mingy.jsfs.ui.backupDatabase";
 	public static final String CMD_RESTORE_DATABASE = "org.mingy.jsfs.ui.restoreDatabase";
+	public static final String CMD_PREFERENCE = "org.mingy.jsfs.ui.preference";
 	public static final String CMD_LOGIN = "org.mingy.jsfs.ui.login";
 	public static final String CMD_LOGOUT = "org.mingy.jsfs.ui.logout";
 	public static final String CMD_CHANGE_PASSWORD = "org.mingy.jsfs.ui.changePassword";

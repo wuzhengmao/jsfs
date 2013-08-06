@@ -37,10 +37,10 @@ public class BackupDatabaseAction extends Action {
 		this.window = window;
 		setId(ICommandIds.CMD_BACKUP_DATABASE);
 		setActionDefinitionId(ICommandIds.CMD_BACKUP_DATABASE);
-		setImageDescriptor(Activator
-				.getImageDescriptor("/icons/backup_database.gif"));
-		setDisabledImageDescriptor(Activator
-				.getImageDescriptor("/icons/backup_database_disabled.gif"));
+		// setImageDescriptor(Activator
+		// .getImageDescriptor("/icons/backup_database.gif"));
+		// setDisabledImageDescriptor(Activator
+		// .getImageDescriptor("/icons/backup_database_disabled.gif"));
 	}
 
 	@Override

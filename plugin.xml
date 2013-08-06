@@ -123,6 +123,11 @@
             id="org.mingy.jsfs.ui.openConsole">
       </command>
       <command
+            name="首选项"
+            description="设置首选项参数"
+            id="org.mingy.jsfs.ui.preference">
+      </command>
+      <command
             name="登录..."
             description="以其他身份登录"
             id="org.mingy.jsfs.ui.login">

@@ -37,6 +37,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	public void preWindowOpen() {
 		final IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
+		Application.getInstance().setWindowConfigurer(configurer);
 		Rectangle screenSize = Display.getDefault().getClientArea();
 		configurer
 				.setInitialSize(new Point(screenSize.width, screenSize.height));
