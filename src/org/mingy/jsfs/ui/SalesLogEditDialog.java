@@ -54,7 +54,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.mingy.jsfs.Activator;
-import org.mingy.jsfs.facade.IConfigFacade;
 import org.mingy.jsfs.facade.ISalesLogFacade;
 import org.mingy.jsfs.model.Goods;
 import org.mingy.jsfs.model.GoodsType;
@@ -87,6 +86,8 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 	private Text txtMemo;
 	private TableViewer tableViewer;
 	private ComboBoxViewerCellEditor cvceGoods;
+	private ISalesLogFacade salesLogFacade = GlobalBeanContext.getInstance()
+			.getBean(ISalesLogFacade.class);
 
 	/**
 	 * Create the dialog.
@@ -670,20 +671,15 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 	@Override
 	protected void okPressed() {
 		if (editMode
-				&& "LOCK".equals(GlobalBeanContext
-						.getInstance()
-						.getBean(IConfigFacade.class)
-						.getConfig(
-								Calendars.get10Date(originSalesLog
-										.getSalesTime())))) {
+				&& salesLogFacade
+						.isLocked(originSalesLog.getSalesTime())) {
 			MessageDialog.openError(getShell(), Langs
 					.getText("error.save.title"), Langs.getText(
 					"error.save.message.salesLogLocked",
 					Calendars.get10Date(originSalesLog.getSalesTime())));
 			return;
-		} else if ("LOCK".equals(GlobalBeanContext.getInstance()
-				.getBean(IConfigFacade.class)
-				.getConfig(Calendars.get10Date(salesLog.getSalesTime())))) {
+		} else if (salesLogFacade
+				.isLocked(salesLog.getSalesTime())) {
 			MessageDialog.openError(getShell(), Langs
 					.getText("error.save.title"), Langs.getText(
 					"error.save.message.salesLogLocked",
@@ -691,7 +687,7 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 			return;
 		}
 		try {
-			GlobalBeanContext.getInstance().getBean(ISalesLogFacade.class)
+			salesLogFacade
 					.saveSalesLog(salesLog);
 			SalesLogQueryCondition queryCondition = (SalesLogQueryCondition) SalesLogListEditorInput
 					.getInstance().getAdapter(SalesLogQueryCondition.class);
@@ -730,13 +726,8 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 	protected void buttonPressed(int buttonId) {
 		super.buttonPressed(buttonId);
 		if (buttonId == IDialogConstants.IGNORE_ID) {
-			if ("LOCK"
-					.equals(GlobalBeanContext
-							.getInstance()
-							.getBean(IConfigFacade.class)
-							.getConfig(
-									Calendars.get10Date(originSalesLog
-											.getSalesTime())))) {
+			if (salesLogFacade
+					.isLocked(originSalesLog.getSalesTime())) {
 				MessageDialog.openError(getShell(), Langs
 						.getText("error.delete.title"), Langs.getText(
 						"error.delete.message.salesLogLocked",
@@ -748,7 +739,7 @@ public class SalesLogEditDialog extends TitleAreaDialog implements
 					Langs.getText("confirm.delete_salesLog.message"))) {
 				return;
 			}
-			GlobalBeanContext.getInstance().getBean(ISalesLogFacade.class)
+			salesLogFacade
 					.deleteSalesLog(salesLog.getId());
 			List<SalesLog> list = (List<SalesLog>) SalesLogListEditorInput
 					.getInstance().getAdapter(List.class);

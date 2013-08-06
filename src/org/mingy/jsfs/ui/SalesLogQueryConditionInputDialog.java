@@ -3,6 +3,7 @@ package org.mingy.jsfs.ui;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -184,18 +185,21 @@ public class SalesLogQueryConditionInputDialog extends TitleAreaDialog
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void okPressed() {
-		List<SalesLog> result = GlobalBeanContext.getInstance()
-				.getBean(ISalesLogFacade.class).querySalesLog(queryCondition);
-		queryCondition.copyTo((SalesLogQueryCondition) SalesLogListEditorInput
-				.getInstance().getAdapter(SalesLogQueryCondition.class));
-		List<SalesLog> list = (List<SalesLog>) SalesLogListEditorInput
-				.getInstance().getAdapter(List.class);
+		ISalesLogFacade salesLogFacade = GlobalBeanContext.getInstance()
+				.getBean(ISalesLogFacade.class);
+		List<SalesLog> result = salesLogFacade.querySalesLog(queryCondition);
+		SalesLogListEditorInput input = SalesLogListEditorInput.getInstance();
+		queryCondition.copyTo((SalesLogQueryCondition) input
+				.getAdapter(SalesLogQueryCondition.class));
+		Set<String> set = (Set<String>) input.getAdapter(Set.class);
+		set.clear();
+		set.addAll(salesLogFacade.queryLockedDays(
+				queryCondition.getStartDate(), queryCondition.getEndDate()));
+		List<SalesLog> list = (List<SalesLog>) input.getAdapter(List.class);
 		list.clear();
 		list.addAll(result);
 		try {
-			window.getActivePage().openEditor(
-					SalesLogListEditorInput.getInstance(),
-					SalesLogListEditor.ID);
+			window.getActivePage().openEditor(input, SalesLogListEditor.ID);
 		} catch (PartInitException e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("error on open editor", e);

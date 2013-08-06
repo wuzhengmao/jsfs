@@ -24,6 +24,7 @@
 
 	<bean id="salesLogFacade" class="org.mingy.jsfs.facade.impl.SalesLogFacadeImpl">
 		<property name="entityDao" ref="entityDao" />
+		<property name="configFacade" ref="configFacade" />
 	</bean>
 
 	<bean id="salaryFacade" class="org.mingy.jsfs.facade.impl.SalaryFacadeImpl">

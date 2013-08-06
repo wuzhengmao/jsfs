@@ -93,14 +93,14 @@
             id="org.mingy.jsfs.ui.querySalesLog">
       </command>
       <command
-            name="锁定销售记录..."
-            description="锁定销售记录以防篡改"
-            id="org.mingy.jsfs.ui.lockSalesLog">
-      </command>
-      <command
             name="统计销售记录..."
             description="根据输入条件统计销售记录"
             id="org.mingy.jsfs.ui.statSalesLog">
+      </command>
+      <command
+            name="锁定销售记录..."
+            description="锁定销售记录以防篡改"
+            id="org.mingy.jsfs.ui.lockSalesLog">
       </command>
       <command
             name="计算工资..."

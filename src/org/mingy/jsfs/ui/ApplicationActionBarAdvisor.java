@@ -30,8 +30,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	private IAction openCatalogAction;
 	private IAction inputSalesLogAction;
 	private IAction querySalesLogAction;
-	private IAction lockSalesLogAction;
 	private IAction statSalesLogAction;
+	private IAction lockSalesLogAction;
 	private IAction calcSalaryAction;
 	private IAction backupDatabaseAction;
 	private IAction restoreDatabaseAction;
@@ -92,15 +92,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			register(querySalesLogAction);
 		}
 		{
-			lockSalesLogAction = new LockSalesLogAction(window,
-					"锁定销售记录(&L)...");
-			lockSalesLogAction.setToolTipText("锁定销售记录");
-			register(lockSalesLogAction);
-		}
-		{
 			statSalesLogAction = new StatSalesLogAction(window, "统计销售记录(&S)...");
 			statSalesLogAction.setToolTipText("统计销售记录");
 			register(statSalesLogAction);
+		}
+		{
+			lockSalesLogAction = new LockSalesLogAction(window, "锁定销售记录(&L)...");
+			lockSalesLogAction.setToolTipText("锁定销售记录");
+			register(lockSalesLogAction);
 		}
 		{
 			calcSalaryAction = new CalcSalaryAction(window, "计算工资(&C)...");
@@ -140,8 +139,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 			changePasswordAction.setToolTipText("更改当前身份的口令");
 			register(changePasswordAction);
 		}
-		lockSalesLogAction.setEnabled(false);
 		statSalesLogAction.setEnabled(false);
+		lockSalesLogAction.setEnabled(false);
 		calcSalaryAction.setEnabled(false);
 		backupDatabaseAction.setEnabled(false);
 		restoreDatabaseAction.setEnabled(false);
@@ -151,9 +150,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 				new RoleChangeListener() {
 					@Override
 					public void onChange(Role oldRole, Role newRole) {
-						lockSalesLogAction
-								.setEnabled(newRole == Role.ACCOUNTING);
 						statSalesLogAction
+								.setEnabled(newRole == Role.ACCOUNTING);
+						lockSalesLogAction
 								.setEnabled(newRole == Role.ACCOUNTING);
 						calcSalaryAction.setEnabled(newRole == Role.ACCOUNTING);
 						backupDatabaseAction.setEnabled(newRole == Role.ADMIN);
@@ -188,8 +187,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		menuBar.add(launchMenu);
 		launchMenu.add(inputSalesLogAction);
 		launchMenu.add(querySalesLogAction);
-		launchMenu.add(lockSalesLogAction);
 		launchMenu.add(statSalesLogAction);
+		launchMenu.add(lockSalesLogAction);
 		launchMenu.add(new Separator());
 		launchMenu.add(calcSalaryAction);
 		launchMenu.add(new Separator());
@@ -220,8 +219,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		toolbar.add(new Separator());
 		toolbar.add(inputSalesLogAction);
 		toolbar.add(querySalesLogAction);
-		toolbar.add(lockSalesLogAction);
 		toolbar.add(statSalesLogAction);
+		toolbar.add(lockSalesLogAction);
 		toolbar.add(new Separator());
 		toolbar.add(calcSalaryAction);
 		toolbar.add(new Separator());

@@ -2,6 +2,7 @@ package org.mingy.jsfs.ui;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -158,13 +159,19 @@ public class SalesLogStatConditionInputDialog extends TitleAreaDialog implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void okPressed() {
-		SalesLogStat salesLogStat = GlobalBeanContext.getInstance()
-				.getBean(ISalesLogFacade.class).statSalesLog(queryCondition);
+		ISalesLogFacade salesLogFacade = GlobalBeanContext.getInstance()
+				.getBean(ISalesLogFacade.class);
+		SalesLogStat salesLogStat = salesLogFacade.statSalesLog(queryCondition);
 		SalesLogStatEditorInput input = SalesLogStatEditorInput.getInstance();
 		queryCondition.copyTo((SalesLogQueryCondition) input
 				.getAdapter(SalesLogQueryCondition.class));
+		Set<String> set = (Set<String>) input.getAdapter(Set.class);
+		set.clear();
+		set.addAll(salesLogFacade.queryLockedDays(
+				queryCondition.getStartDate(), queryCondition.getEndDate()));
 		input.setSalesLogStat(salesLogStat);
 		IEditorPart editor = window.getActivePage().findEditor(input);
 		try {

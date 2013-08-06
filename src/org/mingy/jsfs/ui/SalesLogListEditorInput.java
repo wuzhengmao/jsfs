@@ -1,8 +1,10 @@
 package org.mingy.jsfs.ui;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.databinding.observable.list.WritableList;
+import org.eclipse.core.databinding.observable.set.WritableSet;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
@@ -16,6 +18,7 @@ public class SalesLogListEditorInput implements IEditorInput {
 
 	private SalesLogQueryCondition queryCondition;
 	private List<SalesLog> salesLogList;
+	private Set<String> lockedDays;
 
 	public static SalesLogListEditorInput getInstance() {
 		if (singleton == null) {
@@ -30,6 +33,7 @@ public class SalesLogListEditorInput implements IEditorInput {
 		queryCondition.setStartDate(Calendars.getMinTimeNow());
 		queryCondition.setEndDate(Calendars.getMaxTimeNow());
 		salesLogList = WritableList.withElementType(SalesLog.class);
+		lockedDays = WritableSet.withElementType(String.class);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -39,6 +43,8 @@ public class SalesLogListEditorInput implements IEditorInput {
 			return queryCondition;
 		} else if (adapter.isAssignableFrom(List.class)) {
 			return salesLogList;
+		} else if (adapter.isAssignableFrom(Set.class)) {
+			return lockedDays;
 		} else {
 			return null;
 		}

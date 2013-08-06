@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.map.IObservableMap;
@@ -16,6 +17,7 @@ import org.eclipse.jface.viewers.OpenEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
@@ -24,7 +26,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
-import org.mingy.jsfs.facade.IConfigFacade;
+import org.mingy.jsfs.Activator;
+import org.mingy.jsfs.facade.ISalesLogFacade;
 import org.mingy.jsfs.model.SalesLog;
 import org.mingy.jsfs.model.SalesLog.SalesLogDetail;
 import org.mingy.jsfs.model.SalesLogQueryCondition;
@@ -60,7 +63,7 @@ public class SalesLogListEditor extends EditorPart {
 				tableViewer, SWT.NONE);
 		TableColumn tableColumn = tableViewerColumn.getColumn();
 		tableColumn.setAlignment(SWT.CENTER);
-		tableColumn.setWidth(120);
+		tableColumn.setWidth(150);
 		tableColumn.setText("销售时间");
 
 		TableViewerColumn tableViewerColumn_1 = new TableViewerColumn(
@@ -89,11 +92,9 @@ public class SalesLogListEditor extends EditorPart {
 				if (!event.getSelection().isEmpty()) {
 					SalesLog salesLog = (SalesLog) ((IStructuredSelection) event
 							.getSelection()).getFirstElement();
-					if (!"LOCK".equals(GlobalBeanContext
-							.getInstance()
-							.getBean(IConfigFacade.class)
-							.getConfig(
-									Calendars.get10Date(salesLog.getSalesTime())))) {
+					if (!GlobalBeanContext.getInstance()
+							.getBean(ISalesLogFacade.class)
+							.isLocked(salesLog.getSalesTime())) {
 						new SalesLogEditDialog(getSite().getShell(), salesLog)
 								.open();
 					} else {
@@ -110,6 +111,12 @@ public class SalesLogListEditor extends EditorPart {
 				new String[] { "salesTime", "staff", "details" });
 		tableViewer
 				.setLabelProvider(new ObservableMapLabelProvider(observeMaps) {
+					@SuppressWarnings("unchecked")
+					private Set<String> lockedDays = (Set<String>) getEditorInput()
+							.getAdapter(Set.class);
+					private Image lockImage = Activator.getImageDescriptor(
+							"/icons/lock_sales_log.gif").createImage();
+
 					@SuppressWarnings("unchecked")
 					@Override
 					public String getColumnText(Object element, int columnIndex) {
@@ -131,13 +138,28 @@ public class SalesLogListEditor extends EditorPart {
 										+ detail.getCount());
 							}
 							return sb.toString();
-						default:
+						case 3:
 							double price = 0;
 							for (SalesLogDetail detail : (List<SalesLogDetail>) attributeMaps[2]
 									.get(element)) {
 								price += detail.getTotalPrice();
 							}
 							return String.valueOf(price);
+						default:
+							return null;
+						}
+					}
+
+					@Override
+					public Image getColumnImage(Object element, int columnIndex) {
+						switch (columnIndex) {
+						case 0:
+							Date salesTime = (Date) attributeMaps[0]
+									.get(element);
+							return lockedDays.contains(Calendars
+									.get10Date(salesTime)) ? lockImage : null;
+						default:
+							return null;
 						}
 					}
 				});
